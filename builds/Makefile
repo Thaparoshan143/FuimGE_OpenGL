@@ -4,9 +4,9 @@ CFLAGS = -Wall
 BUILD_NAME = ./Exe/test
 OBJ_PATH = .
 INC_PATH = -I./includes
-LINKER_MAC = -L. .././includes/lib/mac/libglfw.3.3.dylib
-LINKER_WIN = -L. .././includes/lib/win/libglfw3dll.a
-DIR_OFF = .././src/
+LINKER_MAC = -L. .././lib/mac/libglfw.3.3.dylib
+LINKER_WIN = -L. .././lib/win/libglfw3dll.a
+DIR_OFF = .././Sandbox/
 ASSEMBLE_CMD = 	${CXX} ${CFLAGS} -c
 	
 UNAME_S := $(shell uname -s)
@@ -23,7 +23,7 @@ ifeq ($(OS), Windows_NT) #WINDOWS
 	ECHO_MESSAGE = "Windows"
 endif
 
-FILE_DEPENDENCIES = main.obj glad.obj Shader.obj Window.obj
+FILE_DEPENDENCIES = main.obj glad.obj
 
 # Short hand for combining all the object file into one executable form
 WIN_COMMAND = ${CXX} ${CFLAGS} -o ${BUILD_NAME} ${OBJ_PATH}/*.obj ${INC_PATH} ${LINKER_WIN}
@@ -41,12 +41,6 @@ main.obj: ${DIR_OFF}main.cpp
 
 glad.obj: ${DIR_OFF}glad.cpp
 	${ASSEMBLE_CMD} -o ${OBJ_PATH}/glad.obj ${DIR_OFF}glad.cpp
-
-Shader.obj: ${DIR_OFF}Helpers/Shader.cpp ${DIR_OFF}Helpers/Shader.h
-	${ASSEMBLE_CMD} -o ${OBJ_PATH}/Shader.obj ${DIR_OFF}Helpers/Shader.cpp
-
-Window.obj: ${DIR_OFF}Helpers/Window.cpp ${DIR_OFF}Helpers/Window.h
-	${ASSEMBLE_CMD} -o ${OBJ_PATH}/Window.obj ${DIR_OFF}Helpers/Window.cpp
 
 clean:
 ifeq (${UNAME_S}, Darwin)
