@@ -1,0 +1,5 @@
+/builds/Exe
+/builds/*.obj
+/builds/*.txt
+.vscode
+/src
