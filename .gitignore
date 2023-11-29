@@ -3,3 +3,4 @@
 /builds/*.txt
 .vscode
 /src
+.DS_Store
