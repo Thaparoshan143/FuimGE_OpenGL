@@ -10,8 +10,8 @@ namespace OpenGL
 	{
 		public:
 		OpenGL_App(OpenGL_Win *window);
-		~OpenGL_App() {}
+		~OpenGL_App() {	}
 
-		inline ApplicationInfo GetAppInfo()	{	m_window->GetWindowInfo();	}
+		inline ApplicationInfo GetAppInfo()	{	return m_window->GetWindowInfo();	}
 	};
 }

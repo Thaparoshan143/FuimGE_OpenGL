@@ -13,7 +13,7 @@ namespace Abstract
     {
         public:
         Application(Window *window) {   m_window = window;  }
-        ~Application()  {   delete[] m_window;  }
+        ~Application() {    delete m_window;    }
 
         virtual void Initialize() = 0;
         virtual void Loop() = 0;

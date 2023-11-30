@@ -15,8 +15,7 @@ namespace OpenGL
 		
 		inline static GLFWwindow* GetWindow() {	return m_window;	}
 		void SetActive() override {	glfwMakeContextCurrent(this->m_window);	}
-		void SetColor(float r, float g, float b, float a = 1.0);
-		void SetColor(Color col)	{	SetColor(col.r, col.g, col.b, col.a);	}
+		void SetColor(Color col) override;
 		inline bool ShouldCloseWindow() override {	return glfwWindowShouldClose(this->m_window);	};
 		void SwapFrameBuffer() override	{	glfwSwapBuffers(this->m_window);	};
 

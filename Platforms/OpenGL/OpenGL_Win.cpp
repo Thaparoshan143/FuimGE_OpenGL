@@ -8,10 +8,10 @@ namespace OpenGL
 		initializeOpenGLWindow(wi.dim.x, wi.dim.y, wi.title);
 	}
 
-	void OpenGL_Win::SetColor(float r, float g, float b, float a)
+	void OpenGL_Win::SetColor(Color col)
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-		glClearColor(r, g, b, a);
+		glClearColor(col.r, col.g, col.b, col.a);
 	}
 
 	void OpenGL_Win::initializeOpenGLWindow(int w, int h, String t)
@@ -54,32 +54,44 @@ namespace OpenGL
 	// All the static methods for input definition 
 	static void static_mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
     {
-		std::cout << "Mouse button registered" << std::endl;
-    }
+		#ifdef DEBUG_MODE
+		std::cout << "Mouse button registered || Button : " << button << " || Action : " << action << " || Mods : " << mods << std::endl;
+		#endif
+	}
 
 	static void static_mouse_position_callback(GLFWwindow *window, double xpos, double ypos)
 	{
-		std::cout << "Mouse position changed" << std::endl;
+		#ifdef DEBUG_MODE
+		std::cout << "Mouse position changed to || Xpos : " << xpos << " || Ypos : " << ypos << std::endl;
+		#endif
 	}
 
 	static void static_mouse_scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 	{
-		std::cout << "Mouse scroll detected" << std::endl;
+		#ifdef DEBUG_MODE
+		std::cout << "Mouse scroll detected with offset || xoffset : " << xoffset << " || yoffset : " << yoffset << std::endl;
+		#endif
 	}
 
 	static void static_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 	{
-		std::cout << "Mod based key pressed from keyboard" << std::endl;
+		#ifdef DEBUG_MODE
+		std::cout << "Mod based key pressed from keyboard || key : " << key << " || scancode : " << scancode << " || action : " << " || mods : " << mods << std::endl;
+		#endif
 	}
 
 	static void static_charkey_callback(GLFWwindow *window, uint charKey)
 	{
-		std::cout << "Normal Ascii key pressed..." << std::endl;
+		#ifdef DEBUG_MODE
+		std::cout << "Normal Ascii key pressed... ||  Ascii code : " << charKey << " ||  Letter : " << char(charKey) << std::endl;
+		#endif
 	}
 
 	static void static_framesize_callback(GLFWwindow *window, int width, int height)
 	{
 		glViewport(0, 0, width, height);
-		std::cout << "Frame size changed" << std::endl;
+		#ifdef DEBUG_MODE
+		std::cout << "Frame size changed to || Width : " << width << " || Height : " << height << std::endl;
+		#endif
 	}
 }

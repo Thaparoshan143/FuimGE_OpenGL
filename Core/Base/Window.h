@@ -21,6 +21,7 @@ namespace Abstract
         Window(WindowInfo &winInfo) {   m_winInfo = winInfo;    }
         virtual void SetActive() = 0;
         virtual inline bool ShouldCloseWindow() = 0;
+        virtual void SetColor(Color col) = 0;
         virtual void SwapFrameBuffer() = 0;
         inline iVec2 GetWindowSize() { return m_winInfo.dim; }
         inline WindowInfo GetWindowInfo() { return m_winInfo; }
