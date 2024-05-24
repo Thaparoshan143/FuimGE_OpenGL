@@ -1,4 +1,4 @@
-/builds/Exe
+/builds/Exe/*
 /builds/*.obj
 /builds/*.txt
 .vscode
