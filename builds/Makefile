@@ -1,51 +1,49 @@
-CXX = g++ --std=c++11
-CFLAGS = -Wall
-BUILD_NAME = ./Exe/test
-OBJ_PATH = .
-INC_PATH = -I .././includes -I .././includes/freetypeinc -I .././includes/freetypeinc/freetype
-LINKER_MAC = -L. .././lib/mac/libglfw.3.3.dylib -L. .././lib/mac/libfreetype.6.dylib
-LINKER_WIN = -L. .././lib/win/libglfw3dll.a -L. .././lib/win/libfreetype.dll.a
-SANDBOX_DIR_OFF = .././Sandbox/
+CXX = g++ 
+INC_PATH = ././includes .././includes/freetypeinc .././includes/freetypeinc/freetype
+APP_NAME = ./Exe/test
+OBJ_DIR = ./
+LINKER_MAC = .././lib/mac/libglfw.3.3.dylib .././lib/mac/libfreetype.6.dylib
+LINKER_WIN = .././lib/win/libglfw3dll.a .././lib/win/libfreetype.dll.a
+
+CFLAGS = --std=c++11 -Wall -Wextra $(foreach D, $(INC_PATH), -I$(D))
 PLATFORM_DIR_OFF = ../Platforms/OpenGL/
-ASSEMBLE_CMD = 	${CXX} ${CFLAGS} -c
-	
+SANDBOX_DIR_OFF = ../Sandbox/
+SRC_DIR_OFF = ../fuim/
 UNAME_S := $(shell uname -s)
 
-FILE_DEPENDENCIES = main.obj glad.obj window.obj application.obj shader.obj buffer.obj
+# src files inside the sandbox
+SRC_FILES = glad main
 
-WIN_COMMAND = ${CXX} ${CFLAGS} -o ${BUILD_NAME} ${OBJ_PATH}/*.obj ${INC_PATH} ${LINKER_WIN}
-MAC_COMMAND = ${CXX} ${CFLAGS} -o ${BUILD_NAME} ${OBJ_PATH}/*.obj ${INC_PATH} ${LINKER_MAC}
+CPP_FILE_LIST = $(wildcard $(PLATFORM_DIR_OFF)*.cpp)
+H_FILE_LIST = $(wildcard $(PLATFORM_DIR_OFF)*.h)
 
-sandbox_clean: clean sandbox
+PLATFORM_OBJ = $(patsubst $(PLATFORM_DIR_OFF)%.cpp, $(OBJ_DIR)%.obj, $(CPP_FILE_LIST)) 
+SRC_OBJ = $(patsubst %.cpp, $(OBJ_DIR)%.obj, $(foreach D, $(SRC_FILES), $(D).cpp))
 
-sandbox: ${FILE_DEPENDENCIES}
+# Short hand for combining all the object file into one executable form
+WIN_COMMAND = ${CXX} ${CFLAGS} $(foreach D, $(LINKER_WIN), -L. $(D))
+MAC_COMMAND = ${CXX} ${CFLAGS} $(foreach D, $(LINKER_MAC), -L. $(D))
+
+build_m: $(APP_NAME)
+
+$(APP_NAME) : $(PLATFORM_OBJ) $(SRC_OBJ)
 ifeq (${UNAME_S}, Darwin)
-	${MAC_COMMAND}
+	${MAC_COMMAND} -o $@ $^ 
 else
-	$(WIN_COMMAND)
+	$(WIN_COMMAND) -o $@ $^ 
 endif
 
-main.obj: ${SANDBOX_DIR_OFF}Main.cpp
-	${ASSEMBLE_CMD} -o ${OBJ_PATH}/main.obj ${SANDBOX_DIR_OFF}Main.cpp
+$(OBJ_DIR)%.obj: $(PLATFORM_DIR_OFF)%.cpp 
+	$(CXX) $(CFLAGS) -c -o $@ $<
+	
+$(OBJ_DIR)%.obj: $(SRC_DIR_OFF)%.cpp 
+	$(CXX) $(CFLAGS) -c -o $@ $<
 
-glad.obj: ${SANDBOX_DIR_OFF}glad.cpp
-	${ASSEMBLE_CMD} -o ${OBJ_PATH}/glad.obj ${SANDBOX_DIR_OFF}glad.cpp
-
-window.obj: ${PLATFORM_DIR_OFF}OpenGL_Win.cpp ${PLATFORM_DIR_OFF}OpenGL_Win.h
-	${ASSEMBLE_CMD} -o ${OBJ_PATH}/window.obj ${PLATFORM_DIR_OFF}OpenGL_Win.cpp
-
-application.obj: ${PLATFORM_DIR_OFF}OpenGL_App.cpp ${PLATFORM_DIR_OFF}OpenGL_App.h
-	${ASSEMBLE_CMD} -o ${OBJ_PATH}/application.obj ${PLATFORM_DIR_OFF}OpenGL_App.cpp
-
-shader.obj: ${PLATFORM_DIR_OFF}OpenGL_Sha.cpp ${PLATFORM_DIR_OFF}OpenGL_Sha.h
-	${ASSEMBLE_CMD} -o ${OBJ_PATH}/shader.obj ${PLATFORM_DIR_OFF}OpenGL_Sha.cpp
-
-buffer.obj: ${PLATFORM_DIR_OFF}OpenGL_Buff.cpp ${PLATFORM_DIR_OFF}OpenGL_Buff.cpp
-	${ASSEMBLE_CMD} -o ${OBJ_PATH}/buffer.obj ${PLATFORM_DIR_OFF}OpenGL_Buff.cpp
+clean_build: clean build_m
 
 clean:
 ifeq (${UNAME_S}, Darwin)
-	rm -f *.obj
+	rm -f $(OBJ_DIR)*.obj
 else
-	del -f *.obj
+	del -f $(OBJ_DIR)*.obj
 endif
