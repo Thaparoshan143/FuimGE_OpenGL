@@ -5,7 +5,7 @@ OBJ_DIR = ./
 LINKER_MAC = .././lib/mac/libglfw.3.3.dylib .././lib/mac/libfreetype.6.dylib
 LINKER_WIN = .././lib/win/libglfw3dll.a .././lib/win/libfreetype.dll.a
 
-CFLAGS = --std=c++11 -Wall -Wextra $(foreach D, $(INC_PATH), -I$(D))
+CFLAGS = --std=c++14 -Wall -Wextra $(foreach D, $(INC_PATH), -I$(D))
 PLATFORM_DIR_OFF = ../Platforms/OpenGL/
 SANDBOX_DIR_OFF = ../Sandbox/
 SRC_DIR_OFF = ../fuim/
