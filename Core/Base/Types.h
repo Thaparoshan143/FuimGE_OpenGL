@@ -7,6 +7,7 @@
 
 
 typedef std::string String;
+typedef std::wstring wString;
 
 typedef glm::ivec2 iVec2;
 typedef glm::dvec2 dVec2;
