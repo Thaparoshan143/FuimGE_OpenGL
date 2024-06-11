@@ -3,12 +3,12 @@
 #include"../includes/GLAD/glad.h"
 #include"../includes/GLFW/glfw3.h"
 
-#include"../Platforms/OpenGL/OpenGL_Sha.h"
-#include"../Platforms/OpenGL/OpenGL_Win.h"
-#include"../Platforms/OpenGL/OpenGL_App.h"
-#include"../Platforms/OpenGL/OpenGL_Buff.h"
+#include"../Platforms/OpenGL/OpenGL_Shader.h"
+#include"../Platforms/OpenGL/OpenGL_Window.h"
+#include"../Platforms/OpenGL/OpenGL_Application.h"
+#include"../Platforms/OpenGL/OpenGL_Buffer.h"
 
 using namespace OpenGL;
-using Window = OpenGL_Win;
-using Shader = OpenGL_Sha;
-using Application = OpenGL_App;
+using Window = OpenGL_Window;
+using Shader = OpenGL_Shader;
+using Application = OpenGL_Application;

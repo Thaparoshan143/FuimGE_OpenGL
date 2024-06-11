@@ -3,11 +3,11 @@
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
-class SandboxApp : OpenGL_App
+class FuimApp : public Application
 {
 	public:
-	SandboxApp(Window *instance):OpenGL_App(instance) {}
-	~SandboxApp() {		}
+	FuimApp(ApplicationInfo appInfo):OpenGL_Application(appInfo) {	}
+	~FuimApp() {		}
 
 	void Initialize() override 
 	{
@@ -16,10 +16,12 @@ class SandboxApp : OpenGL_App
 
 	void Loop() override 
 	{
-		while (!m_window->ShouldCloseWindow())
+		
+		while (!(*m_window)->ShouldCloseWindow())
 		{
-            m_window->SetColor(Color(1,1,1,1));
-			m_window->SwapFrameBuffer();
+            (*m_window)->SetBgColor(Color(1, 0.5, 0.2, 1));
+
+			(*m_window)->SwapFrameBuffer();
 			glfwPollEvents();
 		}
 	}
@@ -27,9 +29,10 @@ class SandboxApp : OpenGL_App
 
 int main()
 {
-	ApplicationInfo appInfo(SCR_WIDTH, SCR_HEIGHT, "Sandbox");
+	ApplicationInfo appInfo(SCR_WIDTH, SCR_HEIGHT, "FUIM GE");
     Window *mainWindow = new Window(appInfo);
-	SandboxApp mainApp(mainWindow);
+	FuimApp mainApp(appInfo);
+	mainApp.SetWindow(mainWindow);
 
 	mainApp.Initialize();
 	mainApp.Loop();
