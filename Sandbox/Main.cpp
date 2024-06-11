@@ -1,43 +1,34 @@
-#include"../Platforms/OpenGL/OpenGL_App.h"
-#include"../Core/Base/Object.h"
-#include"../Core/Base/Log.h"
+#include"../Platforms/OpenGL/OpenGL_Application.h"
+#include"../Platforms/OpenGL/OpenGL_Window.h"
 
 #define DEFAULT_SCR_WIDTH 800
 #define DEFAULT_SCR_HEIGHT 600
 
 using namespace OpenGL;
 
-class SandboxApp : public OpenGL_App
+class SandboxApp : public OpenGL_Application
 {
     public:
-    SandboxApp(OpenGL_Win *win) : OpenGL_App(win) {  }
+    SandboxApp(ApplicationInfo appInfo) : OpenGL_Application(appInfo) {  }
     ~SandboxApp()
     {
-        m_objectList.clear();
+
     }
 
     void Initialize() override {    }
     void Loop() override 
     { 
-        for(int i=0;i<5;i++)
+        while(!(*m_window)->ShouldCloseWindow())
         {
-            Abstract::Object *temp = new Abstract::Object;
-            temp->UpdateLayer(i);
-            m_objectList.push_back(temp);
-            Util::Log::PrintObjectInfo(*temp);
-        }
+            (*m_window)->SetBgColor(Color(1));
 
-        while(!m_window->ShouldCloseWindow())
-        {
-            m_window->SetColor(Color(1));
-
-            m_window->SwapFrameBuffer();
+            (*m_window)->SwapFrameBuffer();
             glfwPollEvents();
         } 
     }
 
     private:
-    std::vector<Abstract::Object*> m_objectList;
+    // std::vector<Abstract::Object*> m_objectList;
 };
 
 // Entry point of main Application for sandbox
@@ -45,8 +36,9 @@ int main(int argc, char *args[])
 {
     ApplicationInfo SandboxAppInfo(DEFAULT_SCR_WIDTH, DEFAULT_SCR_HEIGHT, "Sandbox");
 
-    OpenGL_Win *mainWindow = new OpenGL_Win(SandboxAppInfo);
-    SandboxApp *mainApplication = new SandboxApp(mainWindow);
+    OpenGL_Window *mainWindow = new OpenGL_Window(SandboxAppInfo);
+    SandboxApp *mainApplication = new SandboxApp(SandboxAppInfo);
+    mainApplication->SetWindow(mainWindow);
 
     if(mainApplication!=nullptr)
     {
