@@ -7,6 +7,7 @@ struct WindowInfo
     public:
     WindowInfo(int w = 800, int h = 600, String t = String("Application")) : width(w), height(h), title(t)  {   }
     WindowInfo(WindowInfo &winInfo) {    width = winInfo.width;  height = winInfo.height;    title = winInfo.title;  }
+    ~WindowInfo()   {   }
     
     int width, height;
     String title;
