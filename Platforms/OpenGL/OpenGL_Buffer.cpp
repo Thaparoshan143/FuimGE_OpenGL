@@ -5,11 +5,13 @@ namespace OpenGL
     VertexBufferObject::VertexBufferObject(uint reserveSize) : IBufferBase(reserveSize)
     {
         glGenBuffers(1, &this->m_bufferHandle);
+        m_usage = GL_DYNAMIC_DRAW;
     }
 
     IndexBufferObject::IndexBufferObject(uint reserveSize) : IBufferBase(reserveSize)
     {
         glGenBuffers(1, &this->m_bufferHandle);
+        m_usage = GL_DYNAMIC_DRAW;
     }
 
     VertexArrayObject::VertexArrayObject(BufferFormat bf)
