@@ -12,3 +12,6 @@ using namespace OpenGL;
 using Window = OpenGL_Window;
 using Shader = OpenGL_Shader;
 using Application = OpenGL_Application;
+
+#define TESTMODE
+#include"../Util/Util.cpp"
