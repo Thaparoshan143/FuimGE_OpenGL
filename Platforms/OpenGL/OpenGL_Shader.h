@@ -6,10 +6,9 @@
 #include"../../includes/GLM/glm/gtc/type_ptr.hpp"
 
 #include"../../Core/Base/IShader.h"
+#include"../../Core/Base/FileHandler.hpp"
 
 #include <map>
-#include <fstream>
-#include <sstream>
 
 namespace OpenGL
 {

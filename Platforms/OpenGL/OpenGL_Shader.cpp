@@ -4,7 +4,7 @@ namespace OpenGL
 {
     uint OpenGL_Shader::CreateProgram()
     {
-		if(m_programHandle != 0)
+		if(m_programHandle == 0)
 		{
 			CompileProgram();
 		}
@@ -79,20 +79,14 @@ namespace OpenGL
 			glGetShaderInfoLog(id, 512, NULL, infoLog);
 			std::cout << "ERROR::Shader::" << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT") << "::COMPILATION_FAILED\n" << infoLog << std::endl;
 		}
+		delete[] src;
 		return id;
 	}
 
 	const char* OpenGL_Shader::parseShader(String fileName)
 	{
-		std::ifstream fileSrc(this->m_dir + fileName);
-		std::string line;
-		std::stringstream s;
-		while(getline(fileSrc,line))
-		{
-			s << line << "\n";
-		}
-		line = s.str();
-		return line.c_str();
+		File::InpFileStream temp(this->m_dir + fileName);
+		return temp.ReadRaw();
 	}
 		
 	uint OpenGL_Shader::queryUniformMapping(String name)
