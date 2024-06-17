@@ -7,8 +7,14 @@ namespace OpenGL
         glGenBuffers(1, &this->m_bufferHandle);
     }
 
-    VertexArrayObject::VertexArrayObject()
+    IndexBufferObject::IndexBufferObject(uint reserveSize) : IBufferBase(reserveSize)
     {
+        glGenBuffers(1, &this->m_bufferHandle);
+    }
+
+    VertexArrayObject::VertexArrayObject(BufferFormat bf)
+    {
+        m_format = bf;
         glGenVertexArrays(1, &this->m_bufferHandle);
     }
 
@@ -52,7 +58,7 @@ namespace OpenGL
         m_attachBuffers.insert(std::pair<uint, BuffersHandle>(key, temp));
     }
 
-    void VertexArrayObject::SetBufferHandle(uint vboBufferHandle)
+    void VertexArrayObject::SetActiveVBOBufferHandle(uint vboBufferHandle)
     {
         glBindVertexArray(m_bufferHandle);
         if(m_attachBuffers.find(vboBufferHandle) != m_attachBuffers.end())

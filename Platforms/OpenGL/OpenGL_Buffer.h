@@ -21,7 +21,7 @@ namespace OpenGL
     class IndexBufferObject : public Interface::IBufferBase<uint>
     {
         public:
-        IndexBufferObject(uint reserveSize);
+        IndexBufferObject(uint reserveSize = INIT_BUFFER_RESERVE);
 
         uint Bind() override    {   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_bufferHandle);    return m_bufferHandle;    }
         void Unbind() override  {   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);   }
@@ -37,15 +37,16 @@ namespace OpenGL
     class VertexArrayObject 
     {
         public:
-        VertexArrayObject();
+        VertexArrayObject(BufferFormat bf = BufferFormat::PPP_RGB);
 
-        uint Bind() { SetBufferHandle(m_attachBuffers.begin()->first);  return m_bufferHandle;  }
+        uint Bind() { SetActiveVBOBufferHandle(m_attachBuffers.begin()->first);  glBindVertexArray(m_bufferHandle);  return m_bufferHandle;  }
         uint RawBind()  {   glBindVertexArray(m_bufferHandle);  return m_bufferHandle;  }
         void Unbind()   {   glBindVertexArray(0);   }
         void EnableVertexAttrMan(uint count);
         void EnableVertexAttrib();
         void AppendBufferLink(VertexBufferObject *vbo, IndexBufferObject *ibo);
-        void SetBufferHandle(uint vboBufferHandle);
+        void SetActiveVBOBufferHandle(uint vboBufferHandle);
+        uint GetBufferHandle() const {  return m_bufferHandle; }
         void SetFormat(BufferFormat bf) {   m_format = bf;  }
         void ClearBufferLink()  {   m_attachBuffers.clear();    }
 
