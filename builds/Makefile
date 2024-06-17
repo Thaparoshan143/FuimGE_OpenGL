@@ -28,6 +28,7 @@ build_m: $(APP_NAME)
 
 $(APP_NAME) : $(PLATFORM_OBJ) $(SRC_OBJ)
 ifeq (${UNAME_S}, Darwin)
+	@if [ ! -d "./Exe/" ]; then echo "=> Exe Dir doens't exists. Making one <="; mkdir "./Exe/"; fi
 	${MAC_COMMAND} -o $@ $^ 
 else
 	$(WIN_COMMAND) -o $@ $^ 
