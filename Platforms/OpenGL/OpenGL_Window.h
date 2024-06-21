@@ -17,7 +17,7 @@ namespace OpenGL
         void SetActive() override {  glfwMakeContextCurrent(this->m_glfwWindow); }
         void SetBgColor(float r, float g, float b, float a) override {   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    glClearColor(r, g, b, a);   }
 
-        inline GLFWwindow* GetWindowHandle()   {   return m_glfwWindow;    }
+        inline void* GetWindowHandle() override   {   return (void*)m_glfwWindow;    }
         void SwapFrameBuffer() override {   glfwSwapBuffers(this->m_glfwWindow);    }
 
         protected:
