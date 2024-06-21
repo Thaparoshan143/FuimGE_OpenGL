@@ -26,6 +26,7 @@ namespace OpenGL
 		void SetUniformInt(String name, int value);
 		void SetUniformFloat(String name, float value);
 		void SetUniformVec3(String name, fVec3 value);
+		void SetUniformVec4(String name, fVec4 value);
 		void SetUniformMat4(String name, Mat4 value);
 
         protected:

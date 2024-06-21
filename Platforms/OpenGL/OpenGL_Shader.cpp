@@ -56,6 +56,12 @@ namespace OpenGL
 		glUniform3f(location, value.r, value.g, value.b);
 	}
 
+	void OpenGL_Shader::SetUniformVec4(String name, fVec4 value)
+	{
+		uint location = queryUniformMapping(name);
+		glUniform4f(location, value.r, value.g, value.b, value.a);
+	}
+
 	void OpenGL_Shader::SetUniformMat4(String name, Mat4 value)
 	{
 		uint location = queryUniformMapping(name);
