@@ -22,7 +22,8 @@ namespace Singleton
 
         virtual ~TISingleton()  {   }
 
-        static const T* GetInstance()    {   return m_instance;  }
+        public:
+        static T* GetInstance()    {   return m_instance;  }
 
         protected:
         static T *m_instance;
