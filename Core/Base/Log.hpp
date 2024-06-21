@@ -18,7 +18,7 @@ namespace Log
         // Just the required text
         BASIC = 0,
         TIME_STAMP = 1,
-    };
+    }LogDetail;
 
     class Debug
     {
@@ -72,4 +72,15 @@ namespace Log
 
         }
     };
+
+    static void TLogStr(String title, char endOfLine = '\n')
+    {
+        std::cout << title << endOfLine;
+    }
+
+    template<typename T>
+    static void TLogIsPointerNull(T target)
+    {
+        target == nullptr ? TLogStr("=> Yes") : TLogStr("=> No");
+    }
 }
