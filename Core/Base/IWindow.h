@@ -27,6 +27,7 @@ namespace Interface
         virtual void SetActive() = 0;
         virtual inline bool ShouldCloseWindow() = 0;
         virtual void SwapFrameBuffer() = 0;
+        virtual inline void* GetWindowHandle() = 0;
         virtual void SetBgColor(float r, float g, float b, float a = 1.0f) = 0;
         bool IsActive() const {   return m_isActive;  }
         void SetActive(bool status) {   m_isActive = status;    }
