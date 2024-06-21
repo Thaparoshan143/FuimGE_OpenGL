@@ -8,10 +8,34 @@ namespace OpenGL
         m_usage = GL_DYNAMIC_DRAW;
     }
 
+    void VertexBufferObject::ReserveBuffer(uint size, uint loadMode)
+    {
+        Bind();
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, NULL, loadMode);
+    }
+
+    void VertexBufferObject::LoadSubBuffer(uint size, float *data)
+    {
+        Bind();
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * size, data);
+    }
+
     IndexBufferObject::IndexBufferObject(uint reserveSize) : IBufferBase(reserveSize)
     {
         glGenBuffers(1, &this->m_bufferHandle);
         m_usage = GL_DYNAMIC_DRAW;
+    }
+
+    void IndexBufferObject::ReserveBuffer(uint size, uint loadMode)
+    {
+        Bind();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float) * size, NULL, loadMode);
+    }
+
+    void IndexBufferObject::LoadSubBuffer(uint size, uint *data)
+    {
+        Bind();
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint) * size, data);
     }
 
     VertexArrayObject::VertexArrayObject(BufferFormat bf)
@@ -68,7 +92,7 @@ namespace OpenGL
             BuffersHandle temp = m_attachBuffers[vboBufferHandle];
             if(temp.vbo == nullptr)
             {
-                std::cout << "VBO attached is NULL" << std::endl;
+                // std::cout << "VBO attached is NULL" << std::endl;
             }
             else
             {
@@ -76,7 +100,7 @@ namespace OpenGL
             }
             if(temp.ibo == nullptr)
             {
-                std::cout << "No active attached IBO for this element" << std::endl;
+                // std::cout << "No active attached IBO for this element" << std::endl;
             }
             else
             {

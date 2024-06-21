@@ -16,6 +16,8 @@ namespace OpenGL
         uint Bind() override    {   glBindBuffer(GL_ARRAY_BUFFER, this->m_bufferHandle);    return m_bufferHandle;    }
         void Unbind() override  {   glBindBuffer(GL_ARRAY_BUFFER, 0);  }
         void Offload() override {   Bind(); glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m_buffer.size(), this->m_buffer.data(), m_usage);  }
+        void ReserveBuffer(uint size, uint loadMode = GL_DYNAMIC_DRAW);
+		void LoadSubBuffer(uint size, float *data);
     };
 
     class IndexBufferObject : public Interface::IBufferBase<uint>
@@ -26,6 +28,8 @@ namespace OpenGL
         uint Bind() override    {   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_bufferHandle);    return m_bufferHandle;    }
         void Unbind() override  {   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);   }
         void Offload() override {   Bind(); glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint)*m_buffer.size(), this->m_buffer.data(), m_usage);    }
+        void ReserveBuffer(uint size, uint loadMode = GL_DYNAMIC_DRAW);
+		void LoadSubBuffer(uint size, uint *data);
     };
 
     typedef struct BuffersHandle
