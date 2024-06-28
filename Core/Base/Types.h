@@ -24,3 +24,4 @@ typedef fVec3 Color3;
 typedef glm::mat4 Mat4;
 
 typedef unsigned int uint;
+typedef unsigned char uchar;
