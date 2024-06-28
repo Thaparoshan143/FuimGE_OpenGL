@@ -106,7 +106,44 @@ float* get_quad_bufferind(fVec2 pos, fVec2 dim, Color3 col)
     return temp;
 }
 
-void print_float(float *data, uint count, char seperator='\n')
+float* get_quad_bufferind_uv(fVec2 pos, fVec2 dim, Color3 col, uint uvCount = 2)
+{
+    float *temp = new float[QUAD_IND_VERTEX_COUNT + uvCount*4];
+    float hhei = dim.y/2.0;
+    float hwid = dim.x/2.0;
+    int i = 0;
+
+    *(temp+(6 + uvCount)*i) =  pos.x-hwid;
+    *(temp+(6 + uvCount)*i+1) =  pos.y-hhei;
+    *(temp+(6 + uvCount)*i+6) =  0;
+    *(temp+(6 + uvCount)*i+7) =  0;
+
+    *(temp+(6 + uvCount)*(++i)) = pos.x-hwid;
+    *(temp+(6 + uvCount)*i+1) = pos.y+hhei;
+    *(temp+(6 + uvCount)*i+6) =  0;
+    *(temp+(6 + uvCount)*i+7) =  1;
+
+    *(temp+(6 + uvCount)*(++i)) = pos.x+hwid;
+    *(temp+(6 + uvCount)*i+1) = pos.y-hhei;
+    *(temp+(6 + uvCount)*i+6) =  1;
+    *(temp+(6 + uvCount)*i+7) =  0;
+
+    *(temp+(6 + uvCount)*(++i)) =  pos.x+hwid;
+    *(temp+(6 + uvCount)*i+1) =  pos.y+hhei;
+    *(temp+(6 + uvCount)*i+6) =  1;
+    *(temp+(6 + uvCount)*i+7) =  1;
+
+    for(i=0;i<QUAD_IND_VERTEX_COUNT/PER_VERTEX_MOD;++i)
+    {
+        *(temp+(6 + uvCount)*i+3) = col.r;
+        *(temp+(6 + uvCount)*i+4) = col.g;
+        *(temp+(6 + uvCount)*i+5) = col.b;
+    }
+
+    return temp;
+}
+
+void print_float(float *data, uint count, char seperator = '\n')
 {
     for(uint i=0;i<count;++i)
     {
