@@ -58,6 +58,19 @@ namespace OpenGL
             initFreetype(fontFamily);
         }
 
+        void SetQueueText(String newText, uint index)
+        {
+            if(m_renderQueue.size() <= index)
+            {
+                std::cout << "Out of index access to queue string!!" << std::endl;
+                return;
+            }
+            else
+            {
+                m_renderQueue[index]->SetText(newText);
+            }
+        }
+
         private:
         void initRenderer()
         {
