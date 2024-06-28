@@ -3,6 +3,9 @@
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
+// temporary frame rate locker for now
+#define MAX_FRAME_RATE 1/60.0
+
 class FuimApp : public Application
 {
 	public:
@@ -17,29 +20,34 @@ class FuimApp : public Application
 
 	void Loop() override 
 	{
-		Shader tShader("../res/Shaders/Basic/", "ver.shader", "frag.shader");
+		Shader tShader("../res/Shaders/Projection/", "ver.shader", "frag.shader");
+		Shader texShader("../res/Shaders/Texture/", "ver.shader", "frag.shader");
 		tShader.CompileProgram();
+		texShader.CompileProgram();
+		Texture tex("../res/Images/temp1.jpg");
 
-		VertexArrayObject VAO;
+		VertexArrayObject VAO(BufferFormat::PPP_RGB_UV);
 		VAO.RawBind();
+	
 		VertexBufferObject VBO;
 		IndexBufferObject IBO;
 		IBO.AppendBuffer(get_quad_index(), QUAD_IND_VERTEX_COUNT);
-		VBO.AppendBuffer(get_quad_bufferind({0,0},{1.5, 1.2}, {1, 1, 1}), QUAD_IND_VERTEX_COUNT);
+		VBO.AppendBuffer(get_quad_bufferind_uv({0,0},{1.5, 1.2}, {1, 1, 1}), QUAD_IND_VERTEX_COUNT + 2*4);
 		VBO.Offload();
 		IBO.Offload();
 		VAO.AppendBufferLink(&VBO, &IBO);
 		VAO.EnableVertexAttrib();
+		tex.Offload();
 
 		TextRenderer tempTextRenderer;
 		tempTextRenderer.SetRenderTarget(*std::make_shared<Interface::IWindow*>(*m_window.get()));
 		FreetypeTextProp tempPropFT;
 		tempPropFT.m_textProperties = {Color(0), TextAlignment(CENTER)};
 		tempPropFT.m_textFont = {String("Roboto"), float(1)};
-		tempPropFT.m_textTransform = {fVec3(0), fVec3(0)};
+		tempPropFT.m_textTransform = {fVec3(-0.8), fVec3(0)};
 
 		tempTextRenderer.AddToQueue("Roshan Thapa", tempPropFT);
-		tempPropFT.m_textTransform = {fVec3(0.5), fVec3(0)};
+		tempPropFT.m_textTransform = {fVec3(0.8), fVec3(0)};
 		tempTextRenderer.AddToQueue("Roshan Thapa2", tempPropFT);
 
 		Shader textShader("../res/Shaders/Text/", "ver.shader", "frag.shader");
@@ -47,19 +55,30 @@ class FuimApp : public Application
 
 		while (!(*m_window)->ShouldCloseWindow())
 		{
-			// std::cout << "Main loop entered";
-            (*m_window)->SetBgColor(Color(1, 0.5, 0.2, 1));
+			float startTime = glfwGetTime();
+			float delta = 0;
 
-			tShader.UseProgram();
-			// glDrawArrays(GL_TRIANGLES, 0, 6);
+			startTime = glfwGetTime();
+
+			(*m_window)->SetBgColor(Color(1, 0.5, 0.2, 1));
+
+			texShader.UseProgram();
 			VAO.Bind();
-			glDrawElements(GL_TRIANGLES, 10, GL_UNSIGNED_INT, 0);
+			tex.Bind();
+			Mat4 projection = Mat4(1);
+			texShader.SetUniformMat4("projection", projection);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			
 			tempTextRenderer.RenderText();
-
-			// tempText.Rendertext(textShader.GetProgramHandle(), 0, 0, 0.6, Color3(0.8), false);
 
 			(*m_window)->SwapFrameBuffer();
 			glfwPollEvents();
+
+			while(delta <= MAX_FRAME_RATE)
+			{
+				delta = glfwGetTime() - startTime;
+			}
+			tempTextRenderer.SetQueueText(std::to_string(1/delta), 0);
 		}
 	}
 };
