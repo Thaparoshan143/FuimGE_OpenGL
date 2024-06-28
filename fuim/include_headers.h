@@ -9,6 +9,7 @@
 #include"../Platforms/OpenGL/OpenGL_Buffer.h"
 #include"../Platforms/OpenGL/OpenGL_TextRenderer.hpp"
 #include"../Platforms/OpenGL/OpenGL_Texture.h"
+#include"../Platforms/OpenGL/OpenGL_Timer.hpp"
 
 using namespace OpenGL;
 using Window = OpenGL_Window;

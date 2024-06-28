@@ -3,9 +3,6 @@
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
-// temporary frame rate locker for now
-#define MAX_FRAME_RATE 1/60.0
-
 class FuimApp : public Application
 {
 	public:
@@ -54,11 +51,8 @@ class FuimApp : public Application
 		textShader.CompileProgram();
 
 		while (!(*m_window)->ShouldCloseWindow())
-		{
-			float startTime = glfwGetTime();
-			float delta = 0;
-
-			startTime = glfwGetTime();
+		{	
+			OpenGL::FrameTimer::StartTime();
 
 			(*m_window)->SetBgColor(Color(1, 0.5, 0.2, 1));
 
@@ -74,11 +68,10 @@ class FuimApp : public Application
 			(*m_window)->SwapFrameBuffer();
 			glfwPollEvents();
 
-			while(delta <= MAX_FRAME_RATE)
-			{
-				delta = glfwGetTime() - startTime;
-			}
-			tempTextRenderer.SetQueueText(std::to_string(1/delta), 0);
+			OpenGL::FrameTimer::EndTime();
+			
+			OpenGL::FrameTimer::PassResidualDelta();
+			Log::TLogStr("FPS Count : " + std::to_string(1.0/FrameTimer::GetTimeFromStart()));
 		}
 	}
 };
