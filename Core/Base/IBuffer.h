@@ -25,11 +25,16 @@ typedef enum BufferFormat
     PPP_RGB_UV = 155,
     PPPP_RGB_UV = 156,
 
+    PPP_UV = 131,
+
+    PPP_NNN = 1539,
+    PPP_UV_NNN = 1667,
 }BufferFormat;
 
 #define BUFFER_MASKPPP 0x00000007
 #define BUFFER_MASKRGB 0x00000038
 #define BUFFER_MASKTEX 0x000001C0
+#define BUFFER_MASKNORMAL 0x00000E00
 
 namespace Interface
 {
