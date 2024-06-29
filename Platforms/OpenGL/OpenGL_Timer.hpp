@@ -40,8 +40,7 @@ namespace OpenGL
         static void PassResidualDelta()
         {
             if(m_delta >= m_responseTime)   {   return; }
-            double remainingTime = glfwGetTime() - m_start;
-            usleep(remainingTime * pow(10, 6));
+            usleep((m_responseTime - m_delta) * pow(10, 6));
         }
 
         static void SetFPS(uint fps)   {   m_FPS = fps;    m_responseTime = 1/fps; }
