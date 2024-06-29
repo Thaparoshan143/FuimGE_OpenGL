@@ -1,8 +1,8 @@
 CXX = g++ 
-INC_PATH = ././includes .././includes/freetypeinc .././includes/freetypeinc/freetype
+INC_PATH = .././includes .././includes/freetypeinc .././includes/freetypeinc/freetype .././includes/assimp
 APP_NAME = ./Exe/test
 OBJ_DIR = ./
-LINKER_MAC = .././lib/mac/libglfw.3.3.dylib .././lib/mac/libfreetype.6.dylib
+LINKER_MAC = .././lib/mac/libglfw.3.3.dylib .././lib/mac/libfreetype.6.dylib .././lib/mac/libassimp.5.4.1.dylib
 LINKER_WIN = .././lib/win/libglfw3dll.a .././lib/win/libfreetype.dll.a
 
 CFLAGS = --std=c++14 -Wall -Wextra $(foreach D, $(INC_PATH), -I$(D))
