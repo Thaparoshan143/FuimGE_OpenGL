@@ -17,38 +17,14 @@ class FuimApp : public Application
 
 	void Loop() override 
 	{
-		Shader tShader("../res/Shaders/Projection/", "ver.shader", "frag.shader");
-		Shader texShader("../res/Shaders/Texture/", "ver.shader", "frag.shader");
-		tShader.CompileProgram();
-		texShader.CompileProgram();
-		Texture tex("../res/Images/temp1.jpg");
+		String modelPath = String("../res/Models/cube.fbx");
+		String modelPath2 = String("../res/Models/icoSphere.fbx");
+		
+		OpenGL_Object tempObject(modelPath, "Cube");
+		OpenGL_Object tempObject2(modelPath2, "Ico Sphere");
 
-		VertexArrayObject VAO(BufferFormat::PPP_RGB_UV);
-		VAO.RawBind();
-	
-		VertexBufferObject VBO;
-		IndexBufferObject IBO;
-		IBO.AppendBuffer(get_quad_index(), QUAD_IND_VERTEX_COUNT);
-		VBO.AppendBuffer(get_quad_bufferind_uv({0,0},{1.5, 1.2}, {1, 1, 1}), QUAD_IND_VERTEX_COUNT + 2*4);
-		VBO.Offload();
-		IBO.Offload();
-		VAO.AppendBufferLink(&VBO, &IBO);
-		VAO.EnableVertexAttrib();
-		tex.Offload();
-
-		TextRenderer tempTextRenderer;
-		tempTextRenderer.SetRenderTarget(*std::make_shared<Interface::IWindow*>(*m_window.get()));
-		FreetypeTextProp tempPropFT;
-		tempPropFT.m_textProperties = {Color(0), TextAlignment(CENTER)};
-		tempPropFT.m_textFont = {String("Roboto"), float(1)};
-		tempPropFT.m_textTransform = {fVec3(-0.8), fVec3(0)};
-
-		tempTextRenderer.AddToQueue("Roshan Thapa", tempPropFT);
-		tempPropFT.m_textTransform = {fVec3(0.8), fVec3(0)};
-		tempTextRenderer.AddToQueue("Roshan Thapa2", tempPropFT);
-
-		Shader textShader("../res/Shaders/Text/", "ver.shader", "frag.shader");
-		textShader.CompileProgram();
+		Shader modelShader("../res/Shaders/Model/", "ver.shader", "frag.shader");
+		modelShader.CompileProgram();
 
 		while (!(*m_window)->ShouldCloseWindow())
 		{	
@@ -56,22 +32,21 @@ class FuimApp : public Application
 
 			(*m_window)->SetBgColor(Color(1, 0.5, 0.2, 1));
 
-			texShader.UseProgram();
-			VAO.Bind();
-			tex.Bind();
-			Mat4 projection = Mat4(1);
-			texShader.SetUniformMat4("projection", projection);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			
-			tempTextRenderer.RenderText();
+			modelShader.UseProgram();
+			glm::mat4 tempMat = glm::scale(glm::mat4(1), fVec3(0.0072));
+			tempMat = glm::scale(tempMat, fVec3(0.8));
+
+			modelShader.SetUniformMat4("projection", tempMat);
+			tempObject.RenderObject();
+			tempMat = glm::scale(tempMat, fVec3(0.4));
+			modelShader.SetUniformMat4("projection", tempMat);
+			tempObject2.RenderObject();
 
 			(*m_window)->SwapFrameBuffer();
 			glfwPollEvents();
 
 			OpenGL::FrameTimer::EndTime();
-			
 			OpenGL::FrameTimer::PassResidualDelta();
-			Log::TLogStr("FPS Count : " + std::to_string(1.0/FrameTimer::GetTimeFromStart()));
 		}
 	}
 };
