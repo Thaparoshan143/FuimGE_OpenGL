@@ -8,7 +8,7 @@ namespace OpenGL
     Texture::Texture(String path) : ITexture(path)
     {
         glGenTextures(1, &m_textureHandle);
-        m_type = GL_TEXTURE_2D;
+        m_target = GL_TEXTURE_2D;
         m_channel = 3;
         m_wrapMode = GL_REPEAT;
     }
@@ -17,22 +17,22 @@ namespace OpenGL
     {
         m_channel = texChannel;
         m_wrapMode = wrapMode;
-        m_type = texType;
+        m_target = texType;
     }
 
     void Texture::Offload()
     {
         Bind();
         m_buffer = loadTexture();
-        glTexParameteri(m_type, GL_TEXTURE_WRAP_S, m_wrapMode);
-        glTexParameteri(m_type, GL_TEXTURE_WRAP_T, m_wrapMode);
+        glTexParameteri(m_target, GL_TEXTURE_WRAP_S, m_wrapMode);
+        glTexParameteri(m_target, GL_TEXTURE_WRAP_T, m_wrapMode);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         if(m_buffer != nullptr)
         {
-            glTexImage2D(m_type, 0, GL_RGBA, m_imgDim.x, m_imgDim.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_buffer);
+            glTexImage2D(m_target, 0, GL_RGBA, m_imgDim.x, m_imgDim.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_buffer);
         }
         else
         {
