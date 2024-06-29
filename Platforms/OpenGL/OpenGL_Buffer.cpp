@@ -57,11 +57,14 @@ namespace OpenGL
 
 		// taking all the vertex data and organizing for the shader use case.. first position, color, uv texture, 
 		int verStride = getVBOStride();
+        std::cout << "Stride Count : " << verStride << std::endl;
+        std::cout << "### Position" << std::endl;
 		glVertexAttribPointer(0, getMask(BUFFER_MASKPPP), GL_FLOAT, GL_FALSE, sizeof(float)*verStride, (const void*)0);
 		glEnableVertexAttribArray(0);
 
 		if(getMask(BUFFER_MASKRGB))
 		{
+            std::cout << "### RGB" << std::endl;
 			uint colOffset = getMask(BUFFER_MASKPPP)*sizeof(float);
 			glVertexAttribPointer(1, ((getMask(BUFFER_MASKRGB))>>3), GL_FLOAT, GL_FALSE, sizeof(float)*verStride, (const void*)(colOffset));
 			glEnableVertexAttribArray(1);
@@ -69,9 +72,18 @@ namespace OpenGL
 		
 		if(getMask(BUFFER_MASKTEX))
 		{
+            std::cout << "### UV" << std::endl;
 			uint texOffset = (getMask(BUFFER_MASKPPP)+(getMask(BUFFER_MASKRGB)>>3))*sizeof(float);
 			glVertexAttribPointer(2, ((getMask(BUFFER_MASKTEX)>>6)), GL_FLOAT, GL_FALSE, sizeof(float)*verStride, (const void*)(texOffset));
 			glEnableVertexAttribArray(2);
+		}
+
+		if(getMask(BUFFER_MASKNORMAL))
+		{
+            std::cout << "### Normal" << std::endl;
+			uint norOffset = (getMask(BUFFER_MASKPPP)+(getMask(BUFFER_MASKRGB)>>3)+(getMask(BUFFER_MASKTEX)>>6))*sizeof(float);
+			glVertexAttribPointer(3, ((getMask(BUFFER_MASKNORMAL)>>9)), GL_FLOAT, GL_FALSE, sizeof(float)*verStride, (const void*)(norOffset));
+			glEnableVertexAttribArray(3);
 		}
     }
 
@@ -111,6 +123,6 @@ namespace OpenGL
 
     uint VertexArrayObject::getVBOStride()
     {
-		return (getMask(BUFFER_MASKPPP) + (getMask(BUFFER_MASKRGB)>>3) + (getMask(BUFFER_MASKTEX)>>6));
+		return (getMask(BUFFER_MASKPPP) + (getMask(BUFFER_MASKRGB)>>3) + (getMask(BUFFER_MASKTEX)>>6) + (getMask(BUFFER_MASKNORMAL)>>9));
     }
 }
