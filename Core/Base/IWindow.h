@@ -1,6 +1,7 @@
 #pragma once
 
 #include"./Types.h"
+#include"./ICamera.h"
 
 struct WindowInfo
 {
@@ -36,9 +37,15 @@ namespace Interface
         void SetBgColor(Color col)  {   SetBgColor(col.r, col.g, col.b, col.a); }
         iVec2 GetWindowDim() const    {   return iVec2(m_winInfo.width, m_winInfo.height);    }
         void SetTargetApplication(std::weak_ptr<IApplication*> target) {   m_target = target;  }
+        void SetWindowCameraProp(CameraProp &camProp)   {   m_camera->SetCameraProp(camProp);   }
+        CameraProp GetWindowCameraProp()    {   return m_camera->m_camProp; }
+        ICamera* GetCamera() {  return m_camera;    }
+        // camera will be allocated by the deriving class with appropriate typecasting
+        virtual void setActiveCamera() = 0;
 
-        private:
+        protected:
         std::weak_ptr<IApplication*> m_target;
+        ICamera *m_camera;
         WindowInfo m_winInfo;
         bool m_isActive;
     };

@@ -4,6 +4,31 @@
 
 namespace Transformation
 {
+    typedef enum Movement
+    {
+        FORWARD,
+        BACKWARD,
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN
+    }Movement;
+
+    typedef enum Speed
+    {
+        SLOW = 1,
+        MEDIUM = 1 << 2,
+        FAST = 1 << 3
+    }Speed;
+
+    typedef enum Sensitivity
+    {
+        LOW = 1,
+        AVERAGE = 2, 
+        HIGH = 3,
+        VERYHIGH = 4
+    }Sensitivity;
+
     typedef fVec3 Position;
     typedef fVec3 Scale;
     // for angle based or euler
@@ -39,7 +64,6 @@ namespace Transformation
 
         const inline Transform& GetTransform() {   return *this;    }
 
-        protected:
         union{
             struct
             {

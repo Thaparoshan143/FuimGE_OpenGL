@@ -22,9 +22,9 @@ namespace Interface
         IApplication(ApplicationInfo appInfo) : m_appInfo(appInfo)   {   }
         virtual ~IApplication() {   }
 
-        void SetWindow(IWindow *window) {   m_window = std::make_unique<IWindow*>(window);  }
-        inline IWindow* GetWindow()    {   return *m_window.get();    }
-        inline ApplicationInfo& GetAppInfo()    {   return (*m_window.get())->GetWindowInfo();  }
+        void SetWindow(IWindow *window) {   m_window = window;  }
+        inline IWindow* GetWindow()    {   return m_window;    }
+        inline ApplicationInfo& GetAppInfo()    {   return m_window->GetWindowInfo();  }
 
         // Initial run of application
         virtual void Initialize() = 0;
@@ -33,6 +33,6 @@ namespace Interface
 
         protected:
         ApplicationInfo m_appInfo;
-        std::unique_ptr<IWindow*> m_window;
+        IWindow* m_window;
     };
 }

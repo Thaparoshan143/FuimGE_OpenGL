@@ -2,6 +2,7 @@
 
 #include <map>
 #include"./Types.h"
+#include"./Transformation.hpp"
 
 struct Character {
     uint TextureID; // ID handle of the glyph texture
@@ -10,41 +11,38 @@ struct Character {
     uint Advance;   // Horizontal offset to advance to next glyph
 };
 
-typedef enum TextAlignment
+namespace Text
 {
-    LEFT = 0,
-    CENTER = 1,
-    RIGHT = 2,
-}TextAlignment;
+    typedef enum TextAlignment
+    {
+        LEFT = 0,
+        CENTER = 1,
+        RIGHT = 2,
+    }TextAlignment;
 
-typedef struct TextTransform
-{
-    fVec3 position;
-    fVec3 rotataion;
-}TextTransform;
+    typedef struct TextProperties
+    {
+        Color color;
+        TextAlignment alignment;
+    }TextProperties;
 
-typedef struct TextProperties
-{
-    Color color;
-    TextAlignment alignment;
-}TextProperties;
-
-typedef struct TextFont
-{
-    String family;
-    float size;
-}TextFont;
+    typedef struct TextFont
+    {
+        String family;
+        float size;
+    }TextFont;
+}
 
 namespace Interface
 {
     // This is applicable for Glyph based text rendering like freetype..
 	// - Char as key and Character (struct containg text info) as value // Map from stl std::map<char, Character> 
 	using CharMap = std::map<char, Character>;	
-
+    using namespace Text;
 	class IText
 	{
 		public:
-		IText(String text, TextTransform textTrans, TextProperties textProp, TextFont textFont) : m_text(text),m_textTransform(textTrans), m_textProperties(textProp), m_textFont(textFont) { m_enable = true; }
+		IText(String text, Transformation::Transform textTrans, TextProperties textProp, TextFont textFont) : m_text(text),m_textTransform(textTrans), m_textProperties(textProp), m_textFont(textFont) { m_enable = true; }
         virtual ~IText()    {   }
 
 		void SetAligment(TextAlignment align)	{	m_textProperties.alignment = align;	}
@@ -66,8 +64,8 @@ namespace Interface
         }
 		fVec2 GetAlignmentOffset()
 		{
-            return (m_textProperties.alignment == CENTER) ? fVec2(m_cacheStringOffset.x/2.0, m_cacheStringOffset.y) :
-                    (m_textProperties.alignment == LEFT) ? fVec2(0, m_cacheStringOffset.y) :
+            return (m_textProperties.alignment == Text::CENTER) ? fVec2(m_cacheStringOffset.x/2.0, m_cacheStringOffset.y) :
+                    (m_textProperties.alignment == Text::LEFT) ? fVec2(0, m_cacheStringOffset.y) :
                     fVec2(m_cacheStringOffset.x, m_cacheStringOffset.y);
 		}
 
@@ -104,7 +102,7 @@ namespace Interface
 		CharMap *m_activeCharacters;
         fVec2 m_cacheStringOffset;
         bool m_enable;
-        TextTransform m_textTransform;
+        Transformation::Transform m_textTransform;
         TextProperties m_textProperties;
         TextFont m_textFont;
 	};
