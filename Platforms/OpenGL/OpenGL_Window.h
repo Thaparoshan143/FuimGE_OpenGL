@@ -5,13 +5,16 @@
 
 #include"../../Core/Base/IWindow.h"
 
+#include"./OpenGL_Camera.h"
+#include"./OpenGL_KeyCode.h"
+
 namespace OpenGL
 {
     class OpenGL_Window : public Interface::IWindow
     {
         public:
         OpenGL_Window(WindowInfo winInfo);
-        ~OpenGL_Window()    {   glfwTerminate();    }
+        ~OpenGL_Window()    {   delete m_camera;    glfwTerminate();    }
 
         inline bool ShouldCloseWindow() override {   return glfwWindowShouldClose(this->m_glfwWindow);  }
         void SetActive() override {  glfwMakeContextCurrent(this->m_glfwWindow); }
@@ -19,6 +22,7 @@ namespace OpenGL
 
         inline void* GetWindowHandle() override   {   return (void*)m_glfwWindow;    }
         void SwapFrameBuffer() override {   glfwSwapBuffers(this->m_glfwWindow);    }
+        void setActiveCamera() override;
 
         protected:
         GLFWwindow *m_glfwWindow;

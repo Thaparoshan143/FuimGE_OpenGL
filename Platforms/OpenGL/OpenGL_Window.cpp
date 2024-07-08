@@ -2,6 +2,94 @@
 
 namespace OpenGL
 {
+    static void static_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+    {
+        if(window == nullptr)
+        {
+            std::cout << "Unable to capture the window att" << std::endl;
+        }
+
+        OpenGL_Window *temp = (OpenGL_Window*)glfwGetWindowUserPointer(window);
+
+        if(action == Input::PRESS || action == Input::REPEAT)
+        {
+            if(key == Input::KEY_W)
+            {
+                temp->GetCamera()->processKeyboardNavgiation(Transformation::FORWARD);
+            }
+            else if(key == Input::KEY_S)
+            {
+                temp->GetCamera()->processKeyboardNavgiation(Transformation::BACKWARD);
+            }
+            else if(key == Input::KEY_A)
+            {
+                temp->GetCamera()->processKeyboardNavgiation(Transformation::LEFT);
+            }
+            else if(key == Input::KEY_D)
+            {
+                temp->GetCamera()->processKeyboardNavgiation(Transformation::RIGHT);
+            }
+            else if(key == Input::KEY_Q)
+            {
+                temp->GetCamera()->processKeyboardNavgiation(Transformation::UP);
+            }
+            else if(key == Input::KEY_E)
+            {
+                temp->GetCamera()->processKeyboardNavgiation(Transformation::DOWN);
+            }
+        }
+        // std::cout << char(key) << std::endl;
+    }
+
+    static void static_mouse_btn_callback(GLFWwindow *window, int btn, int action, int mods)
+    {       
+        if(window == nullptr)
+        {
+            std::cout << "Unable to capture the window att" << std::endl;
+        }
+
+        OpenGL_Window *temp = (OpenGL_Window*)glfwGetWindowUserPointer(window);
+
+    }
+
+    static void static_cursor_pos_callback(GLFWwindow *window, double x, double y)
+    {
+        float xpos = static_cast<float>(x);
+        float ypos = static_cast<float>(y);
+
+        static float lastX, lastY;
+        static bool firstMouse = true;
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        float xoffset = xpos - lastX;
+        float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+        lastX = xpos;
+        lastY = ypos;
+
+        if(window == nullptr)
+        {
+            std::cout << "Unable to capture the window att" << std::endl;
+        }
+        OpenGL_Window *temp = (OpenGL_Window*)glfwGetWindowUserPointer(window);
+        temp->GetCamera()->processMouseMovement(xoffset, yoffset);
+    }
+
+    static void static_mouse_scroll(GLFWwindow *window, double xoff, double yoff)
+    {
+        if(window == nullptr)
+        {
+            std::cout << "Unable to capture the window att" << std::endl;
+        }
+        OpenGL_Window *temp = (OpenGL_Window*)glfwGetWindowUserPointer(window);
+        temp->GetCamera()->processMouseScroll(yoff);
+    }
+
     OpenGL_Window::OpenGL_Window(WindowInfo winInfo) : IWindow(winInfo)
     {
         initialize(winInfo.width, winInfo.height, winInfo.title);
@@ -12,7 +100,7 @@ namespace OpenGL
         // loading glfw basics
         if(!glfwInit())
         {
-            exit(-1);
+            exit(-1);     
         }
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -32,5 +120,25 @@ namespace OpenGL
 		}
 
         glfwSetWindowUserPointer(this->m_glfwWindow, this);
+        glfwSetKeyCallback(this->m_glfwWindow, static_key_callback);
+        glfwSetMouseButtonCallback(this->m_glfwWindow, static_mouse_btn_callback);
+        glfwSetCursorPosCallback(this->m_glfwWindow, static_cursor_pos_callback);
+        glfwSetScrollCallback(this->m_glfwWindow, static_mouse_scroll);
+
+        setActiveCamera();
+    }
+
+    void OpenGL_Window::setActiveCamera()
+    {
+        CameraProp newCamProp;
+        newCamProp.worldUp = fVec3(0, 1, 0);
+        newCamProp.pitch = 0;
+        newCamProp.yaw = -90.0;
+        newCamProp.speed = Transformation::Speed::MEDIUM * CAM_SPEEDMULTIPLIER;
+        newCamProp.sensitivity = (Transformation::Sensitivity::AVERAGE) * CAM_SENMULTIPLIER;
+        newCamProp.zoom = 45;
+
+        m_camera = new OpenGL_Camera(newCamProp);
+        m_camera->m_transform.position = fVec3(0, 0, 10);
     }
 }

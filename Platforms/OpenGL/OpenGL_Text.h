@@ -16,9 +16,9 @@ namespace OpenGL
     // This is currently specifically tied to the openGL, might have to move elsewhere later
     typedef struct FreetypeTextProp
     {
-        TextTransform m_textTransform;
-        TextProperties m_textProperties;
-        TextFont m_textFont;
+        Transformation::Transform m_textTransform;
+        Text::TextProperties m_textProperties;
+        Text::TextFont m_textFont;
     }FreetypeTextProp;
 
     // class TextRenderer;
