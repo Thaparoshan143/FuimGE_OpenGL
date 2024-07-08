@@ -1,4 +1,5 @@
 #include"./include_headers.h"
+// #include <typeinfo>
 
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
@@ -12,37 +13,36 @@ class FuimApp : public Application
 	void Initialize() override 
 	{
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   		glEnable( GL_BLEND );
+   		glEnable(GL_BLEND);
 	}
 
 	void Loop() override 
 	{
-		String modelPath = String("../res/Models/cube.fbx");
-		String modelPath2 = String("../res/Models/icoSphere.fbx");
+		String modelPath = String("../res/Models/cube.obj");
 		
 		OpenGL_Object tempObject(modelPath, "Cube");
-		OpenGL_Object tempObject2(modelPath2, "Ico Sphere");
 
 		Shader modelShader("../res/Shaders/Model/", "ver.shader", "frag.shader");
 		modelShader.CompileProgram();
+		Shader cameraShader("../res/Shaders/Camera/", "ver.shader", "frag.shader");
+		cameraShader.CompileProgram();
 
-		while (!(*m_window)->ShouldCloseWindow())
+		OpenGL_Camera *tempCamRef = dynamic_cast<OpenGL_Camera*>(m_window->GetCamera());
+
+		while (!m_window->ShouldCloseWindow())
 		{	
 			OpenGL::FrameTimer::StartTime();
 
-			(*m_window)->SetBgColor(Color(1, 0.5, 0.2, 1));
-
-			modelShader.UseProgram();
-			glm::mat4 tempMat = glm::scale(glm::mat4(1), fVec3(0.0072));
-			tempMat = glm::scale(tempMat, fVec3(0.8));
-
-			modelShader.SetUniformMat4("projection", tempMat);
+			m_window->SetBgColor(Color(0.2, 0.2, 0.2, 1));
+			cameraShader.UseProgram();
+			// modelShader.UseProgram();
+			cameraShader.SetUniformMat4("view", tempCamRef->GetViewMatrix());
+			glm::mat4 tempMat = tempCamRef->GetProjectionMatrix(m_window->GetWindowDim());
+			cameraShader.SetUniformMat4("projection", tempMat);
+			cameraShader.SetUniformMat4("model", tempCamRef->GetModelMatrix());
 			tempObject.RenderObject();
-			tempMat = glm::scale(tempMat, fVec3(0.4));
-			modelShader.SetUniformMat4("projection", tempMat);
-			tempObject2.RenderObject();
 
-			(*m_window)->SwapFrameBuffer();
+			m_window->SwapFrameBuffer();
 			glfwPollEvents();
 
 			OpenGL::FrameTimer::EndTime();

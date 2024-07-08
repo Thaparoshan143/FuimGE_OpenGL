@@ -11,6 +11,7 @@
 #include"../Platforms/OpenGL/OpenGL_Texture.h"
 #include"../Platforms/OpenGL/OpenGL_Object.h"
 #include"../Platforms/OpenGL/OpenGL_Timer.hpp"
+#include"../Platforms/OpenGL/OpenGL_Camera.h"
 
 using namespace OpenGL;
 using Window = OpenGL_Window;
