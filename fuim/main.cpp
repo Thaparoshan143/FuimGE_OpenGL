@@ -29,6 +29,8 @@ class FuimApp : public Application
 
 		OpenGL_Camera *tempCamRef = dynamic_cast<OpenGL_Camera*>(m_window->GetCamera());
 
+		GridLine tempGrid(GridProp({-10, 10}, {10, -10}, {19, 19}));
+
 		while (!m_window->ShouldCloseWindow())
 		{	
 			OpenGL::FrameTimer::StartTime();
@@ -40,6 +42,9 @@ class FuimApp : public Application
 			glm::mat4 tempMat = tempCamRef->GetProjectionMatrix(m_window->GetWindowDim());
 			cameraShader.SetUniformMat4("projection", tempMat);
 			cameraShader.SetUniformMat4("model", tempCamRef->GetModelMatrix());
+			cameraShader.SetUniformVec3("col", fVec3(1, 1, 1));
+			tempGrid.Draw();
+			cameraShader.SetUniformVec3("col", fVec3(1, 0, 0));
 			tempObject.RenderObject();
 
 			m_window->SwapFrameBuffer();

@@ -149,13 +149,13 @@ namespace OpenGL
     {
         CameraProp newCamProp;
         newCamProp.worldUp = fVec3(0, 1, 0);
-        newCamProp.pitch = 0;
-        newCamProp.yaw = -90.0;
-        newCamProp.speed = Transformation::Speed::MEDIUM * CAM_SPEEDMULTIPLIER;
-        newCamProp.sensitivity = (Transformation::Sensitivity::AVERAGE) * CAM_SENMULTIPLIER;
+        newCamProp.pitch = -30;
+        newCamProp.yaw = -45.0;
+        newCamProp.speed = Transformation::Speed::FAST * CAM_SPEEDMULTIPLIER;
+        newCamProp.sensitivity = (Transformation::Sensitivity::VERYHIGH) * CAM_SENMULTIPLIER;
         newCamProp.zoom = 45;
 
         m_camera = new OpenGL_Camera(newCamProp);
-        m_camera->m_transform.position = fVec3(0, 0, 10);
+        m_camera->m_transform.position = fVec3(-15, 10, 15);
     }
 }
