@@ -48,7 +48,7 @@ namespace OpenGL
         void Unbind()   {   glBindVertexArray(0);   }
         void EnableVertexAttrMan(uint count);
         void EnableVertexAttrib();
-        void AppendBufferLink(VertexBufferObject *vbo, IndexBufferObject *ibo);
+        void AppendBufferLink(VertexBufferObject *vbo, IndexBufferObject *ibo = nullptr);
         void SetActiveVBOBufferHandle(uint vboBufferHandle);
         uint GetBufferHandle() const {  return m_bufferHandle; }
         void SetFormat(BufferFormat bf) {   m_format = bf;  }

@@ -87,7 +87,7 @@ namespace OpenGL
 		}
     }
 
-    void VertexArrayObject::AppendBufferLink(VertexBufferObject *vbo, IndexBufferObject *ibo = nullptr)
+    void VertexArrayObject::AppendBufferLink(VertexBufferObject *vbo, IndexBufferObject *ibo)
     {
         uint key = vbo->GetBufferHandle();
         BuffersHandle temp;
