@@ -20,7 +20,7 @@ struct CameraProp
 #define CAM_Z_NEAR 1.0f
 #define CAM_Z_FAR 100.0f
 
-#define CAM_SENMULTIPLIER 0.005
+#define CAM_SENMULTIPLIER 0.01
 #define CAM_SPEEDMULTIPLIER 2.5f
 
 namespace Interface
