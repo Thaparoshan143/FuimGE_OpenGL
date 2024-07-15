@@ -128,7 +128,6 @@ namespace Input
         KEY_RIGHT_CONTROL = GLFW_KEY_RIGHT_CONTROL,
         KEY_RIGHT_ALT = GLFW_KEY_RIGHT_ALT,
         KEY_RIGHT_SUPER = GLFW_KEY_RIGHT_SUPER,
-        KEY_MENU = GLFW_KEY_MENU,
         
         KEY_MENU = GLFW_KEY_MENU,
     }Key;
