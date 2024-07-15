@@ -1,4 +1,5 @@
 #ifdef TESTMODE
+#pragma once
 
 #include<iostream>
 
@@ -150,4 +151,66 @@ void print_float(float *data, uint count, char seperator = '\n')
         std::cout << *(data+i) << " " << seperator;
     }
 }
+
+void seperator(const char *s, uint count)
+{
+    for(uint i=0;i<count;++i)
+    {
+        std::cout << s;
+    }
+    std::cout << std::endl;
+}
+
+float* get_grid_pointxy_ind(fVec2 start, fVec2 end, fVec2 gridCount)
+{
+    int pointCount = ((gridCount.x + 2 + gridCount.y + 2)*2)*3;
+    // std::cout << "Point Count : " << pointCount << std::endl;
+    float *temp = new float[pointCount];
+    fVec2 offset = fVec2((end.x - start.x) / (gridCount.x + 1), (end.y - start.y) / (gridCount.y + 1));
+    // std::cout << "Offset : " << offset.x << ", " << offset.y << std::endl;
+
+    // populating x coordinates
+    for(int i = 0; i<gridCount.x+2;++i)
+    {
+        *(temp++) = start.x + i * offset.x;
+        *(temp++);
+        *(temp++) = start.y;
+        *(temp++) = start.x + i * offset.x;
+        *(temp++);
+        *(temp++) = end.y;
+        // std::cout << *(temp-2) << "\t, " << *(temp-1) << std::endl;
+    }
+    // seperator("-", 100);
+
+    // populating y coordinates
+    for(int i = 0; i<gridCount.y+2;++i)
+    {
+        *(temp++) = start.x;
+        *(temp++);
+        *(temp++) = start.y + i * offset.y;
+        *(temp++) = end.x;
+        *(temp++);
+        *(temp++) = start.y + i * offset.y;
+        // std::cout << *(temp-2) << "\t, " << *(temp-1) << std::endl;
+    }
+    // seperator("-", 100);
+    
+    // std::cout << " => first : " << *(temp-pointCount) << std::endl;
+    // seperator(" * ",30);
+    return (temp-pointCount);
+}
+
+uint get_grid_xy_size(fVec2 gridCount)
+{
+    return ((gridCount.x + 2 + gridCount.y + 2)*2)*3;
+}
+
+void print_point_2d(float *data, uint pointCount)
+{
+    for(int i=0;i<pointCount/2;i++)
+    {
+        std::cout <<  "X : " << *(data++) << "\t, Y : " << *(data++) << std::endl;
+    }
+}
+
 #endif
