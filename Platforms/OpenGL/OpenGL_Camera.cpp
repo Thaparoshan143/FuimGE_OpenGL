@@ -9,6 +9,10 @@ namespace OpenGL
 
     void OpenGL_Camera::processKeyboardNavgiation(Transformation::Movement direction, float delta)
     {
+        if(!m_isActive)
+        {
+            return;
+        }
         float vel = m_camProp.speed * delta;
 
         switch(direction)
@@ -40,12 +44,21 @@ namespace OpenGL
 
     void OpenGL_Camera::processMouseScroll(float scrollLength)
     {
+        if(!m_isActive)
+        {
+            return;
+        }
         m_camProp.zoom -= scrollLength;
         m_camProp.zoom = Maths::_clamp<float>(m_camProp.zoom, CAM_ZOOM_LOW, CAM_ZOOM_HIGH);
     }
 
     void OpenGL_Camera::processMouseMovement(float xOff, float yOff, bool constrainPitch)
     {
+        if(!m_isActive)
+        {
+            return;
+        }   
+        
         xOff *= m_camProp.sensitivity;
         yOff *= m_camProp.sensitivity;
 
