@@ -29,6 +29,34 @@ namespace Transformation
         VERYHIGH = 4
     }Sensitivity;
 
+    typedef struct EulerAngle
+    {
+        public:
+        EulerAngle(float p)
+        {
+            pitch = yaw = roll = p;
+        }
+
+        EulerAngle(float p, float y, float r = 0)
+        {
+            pitch = p;
+            yaw = y;
+            roll = r;
+        }
+
+        union
+        {
+            struct
+            {
+                float pitch, yaw, roll;
+            };
+            struct
+            {
+                float x, y, z;
+            };
+        };
+    }EulerAngle;
+
     typedef fVec3 Position;
     typedef fVec3 Scale;
     // for angle based or euler
