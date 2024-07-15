@@ -90,6 +90,22 @@ namespace OpenGL
         temp->GetCamera()->processMouseScroll(yoff);
     }
 
+    static void static_mouse_inside_window(GLFWwindow *window, int inside)
+    {
+        OpenGL_Window *temp = (OpenGL_Window*)glfwGetWindowUserPointer(window);
+
+        if(inside)
+        {
+            temp->GetCamera()->m_isActive = true;
+            std::cout << "I am inside" << std::endl;
+        }
+        else
+        {
+            temp->GetCamera()->m_isActive = false;
+            std::cout << "I am outside" << std::endl;
+        }
+    }
+
     OpenGL_Window::OpenGL_Window(WindowInfo winInfo) : IWindow(winInfo)
     {
         initialize(winInfo.width, winInfo.height, winInfo.title);
@@ -124,6 +140,7 @@ namespace OpenGL
         glfwSetMouseButtonCallback(this->m_glfwWindow, static_mouse_btn_callback);
         glfwSetCursorPosCallback(this->m_glfwWindow, static_cursor_pos_callback);
         glfwSetScrollCallback(this->m_glfwWindow, static_mouse_scroll);
+        glfwSetCursorEnterCallback(this->m_glfwWindow, static_mouse_inside_window);
 
         setActiveCamera();
     }
