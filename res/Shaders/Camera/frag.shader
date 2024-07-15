@@ -8,5 +8,5 @@ uniform vec3 col = vec3(1, 1, 1);
 
 void main()
 {
-	FragColor = vec4(TexCoords.x, TexCoords.y, 0, 1.0);
+	FragColor = vec4(col.x, col.y, col.z, 1.0);
 }
