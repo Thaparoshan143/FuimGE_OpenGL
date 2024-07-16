@@ -14,6 +14,8 @@ class FuimApp : public Application
 	{
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    		glEnable(GL_BLEND);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK); 
 	}
 
 	void Loop() override 
@@ -22,29 +24,37 @@ class FuimApp : public Application
 		
 		OpenGL_Object tempObject(modelPath, "Cube");
 
-		Shader modelShader("../res/Shaders/Model/", "ver.shader", "frag.shader");
-		modelShader.CompileProgram();
-		Shader cameraShader("../res/Shaders/Camera/", "ver.shader", "frag.shader");
+		Shader gridShader("../res/Shaders/Camera/", "ver.shader", "frag.shader");
+		gridShader.CompileProgram();
+		Shader cameraShader("../res/Shaders/Lighting/Directional/", "ver.shader", "frag.shader");
 		cameraShader.CompileProgram();
 
 		OpenGL_Camera *tempCamRef = dynamic_cast<OpenGL_Camera*>(m_window->GetCamera());
 
-		GridLine tempGrid(GridProp({-10, 10}, {10, -10}, {19, 19}));
+		GridLine tempGrid(this->m_window, GridProp({-10, 10}, {10, -10}, {19, 19}));
 
 		while (!m_window->ShouldCloseWindow())
 		{	
 			OpenGL::FrameTimer::StartTime();
 
-			m_window->SetBgColor(Color(0.2, 0.2, 0.2, 1));
+			m_window->SetBgColor(Color(0.1, 0.1, 0.1, 1));
+
+			tempGrid.Draw();
+
 			cameraShader.UseProgram();
-			// modelShader.UseProgram();
 			cameraShader.SetUniformMat4("view", tempCamRef->GetViewMatrix());
-			glm::mat4 tempMat = tempCamRef->GetProjectionMatrix(m_window->GetWindowDim());
+			Mat4 tempMat = tempCamRef->GetProjectionMatrix(m_window->GetWindowDim());
 			cameraShader.SetUniformMat4("projection", tempMat);
 			cameraShader.SetUniformMat4("model", tempCamRef->GetModelMatrix());
-			cameraShader.SetUniformVec3("col", fVec3(1, 1, 1));
-			tempGrid.Draw();
-			cameraShader.SetUniformVec3("col", fVec3(1, 0, 0));
+			cameraShader.SetUniformVec3("col", fVec3(1, 0.5, 0.2));
+			cameraShader.SetUniformVec3("light.direction", fVec3(-0.2f, -1.0f, -0.3f));
+			cameraShader.SetUniformVec3("viewPos", tempCamRef->m_transform.position);
+
+			// light properties
+			cameraShader.SetUniformVec3("light.ambient", fVec3(0.05f));
+			cameraShader.SetUniformVec3("light.diffuse", fVec3(0.5f));
+			cameraShader.SetUniformVec3("light.specular", fVec3(1.0f));
+
 			tempObject.RenderObject();
 
 			m_window->SwapFrameBuffer();
