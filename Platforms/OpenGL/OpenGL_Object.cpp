@@ -12,9 +12,9 @@ namespace OpenGL
 
     void OpenGL_Object::RenderObject()
     {
-        for(uint i=0;i<(uint)m_meshes.size();++i)
+        for(uint i = 0;i<(uint)m_meshes.size();++i)
         {
-            m_meshes[i]->Draw();
+            m_meshes[(uint)m_meshes.size() - i - 1]->Draw();
         }
     }
 
