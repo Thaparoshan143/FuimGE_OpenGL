@@ -8,12 +8,12 @@
 
 namespace OpenGL
 {
-    class OpenGL_Object : public Interface::IEntity
+    class OpenGL_Object : public Interface::IRenderableEntity
     {
         public:
         OpenGL_Object(const String &path, String name = DEFAULT_ENTITY_NAME, bool gamma = false);
 
-        void RenderObject();
+        void Render() override;
 
         protected:
         void loadModel(const String &path);

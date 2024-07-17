@@ -10,11 +10,11 @@ namespace OpenGL
         loadModel(path);
     }
 
-    void OpenGL_Object::RenderObject()
+    void OpenGL_Object::Render()
     {
         for(uint i = 0;i<(uint)m_meshes.size();++i)
         {
-            m_meshes[(uint)m_meshes.size() - i - 1]->Draw();
+            m_meshes[(uint)m_meshes.size() - i - 1]->Render();
         }
     }
 
