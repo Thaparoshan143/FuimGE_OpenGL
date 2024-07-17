@@ -20,7 +20,7 @@ class FuimApp : public Application
 
 	void Loop() override 
 	{
-		String modelPath = String("../res/Models/Car.obj");
+		String modelPath = String("../res/Models/cube.obj");
 		
 		OpenGL_Object tempObject(modelPath, "Cube");
 
@@ -31,7 +31,7 @@ class FuimApp : public Application
 
 		OpenGL_Camera *tempCamRef = dynamic_cast<OpenGL_Camera*>(m_window->GetCamera());
 
-		GridLine tempGrid(this->m_window, GridProp({-10, 10}, {10, -10}, {19, 19}));
+		GridLine tempGrid(this->m_window, GridProp({-5, 5}, {5, -5}, {19, 19}));
 
 		while (!m_window->ShouldCloseWindow())
 		{	
@@ -55,7 +55,7 @@ class FuimApp : public Application
 			cameraShader.SetUniformVec3("light.diffuse", fVec3(0.5f));
 			cameraShader.SetUniformVec3("light.specular", fVec3(1.0f));
 
-			tempObject.RenderObject();
+			tempObject.Render();
 
 			m_window->SwapFrameBuffer();
 			glfwPollEvents();
