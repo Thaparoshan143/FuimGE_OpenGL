@@ -173,10 +173,10 @@ float* get_grid_pointxy_ind(fVec2 start, fVec2 end, fVec2 gridCount)
     for(int i = 0; i<gridCount.x+2;++i)
     {
         *(temp++) = start.x + i * offset.x;
-        *(temp++);
+        temp++;
         *(temp++) = start.y;
         *(temp++) = start.x + i * offset.x;
-        *(temp++);
+        temp++;
         *(temp++) = end.y;
         // std::cout << *(temp-2) << "\t, " << *(temp-1) << std::endl;
     }
@@ -186,10 +186,10 @@ float* get_grid_pointxy_ind(fVec2 start, fVec2 end, fVec2 gridCount)
     for(int i = 0; i<gridCount.y+2;++i)
     {
         *(temp++) = start.x;
-        *(temp++);
+        temp++;
         *(temp++) = start.y + i * offset.y;
         *(temp++) = end.x;
-        *(temp++);
+        temp++;
         *(temp++) = start.y + i * offset.y;
         // std::cout << *(temp-2) << "\t, " << *(temp-1) << std::endl;
     }
@@ -207,9 +207,9 @@ uint get_grid_xy_size(fVec2 gridCount)
 
 void print_point_2d(float *data, uint pointCount)
 {
-    for(int i=0;i<pointCount/2;i++)
+    for(uint i=0;i<(uint)pointCount/2;i++)
     {
-        std::cout <<  "X : " << *(data++) << "\t, Y : " << *(data++) << std::endl;
+        std::cout <<  "X : " << *(data+2*i) << "\t, Y : " << *(data+2*i+1) << std::endl;
     }
 }
 

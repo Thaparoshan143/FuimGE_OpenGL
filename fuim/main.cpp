@@ -20,7 +20,7 @@ class FuimApp : public Application
 
 	void Loop() override 
 	{
-		String modelPath = String("../res/Models/cube.obj");
+		String modelPath = String("../res/Models/Car.obj");
 		
 		OpenGL_Object tempObject(modelPath, "Cube");
 

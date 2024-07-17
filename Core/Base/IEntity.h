@@ -15,8 +15,8 @@ namespace Interface
         void SetName(String name)   {   m_name = name;  }
         const String& GetName() {   return m_name;  }
         bool IsActive() {   return m_isActive & true;   }
-        bool SetIsActive(bool isActive) {   return m_isActive;  }
-        Transformation::Transform GetTransform()    {   m_transform.GetTransform(); }
+        void SetIsActive(bool isActive) {   m_isActive = isActive;  }
+        Transformation::Transform GetTransform()    {   return m_transform.GetTransform(); }
         void SetTransform(Transformation::Transform transform)  {   m_transform = transform;    }
 
         // Later replace name with hashed string

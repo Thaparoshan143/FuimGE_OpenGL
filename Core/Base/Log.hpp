@@ -69,11 +69,11 @@ namespace Log
 
         void fileLog(uint mode)
         {
-
+            
         }
     };
 
-    static void TLogStr(String title, char endOfLine = '\n')
+    static inline void TLogStr(String title, char endOfLine = '\n')
     {
         std::cout << title << endOfLine;
     }

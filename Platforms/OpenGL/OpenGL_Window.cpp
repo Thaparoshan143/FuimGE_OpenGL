@@ -10,7 +10,7 @@ namespace OpenGL
         }
 
         OpenGL_Window *temp = (OpenGL_Window*)glfwGetWindowUserPointer(window);
-
+        
         if(action == Input::PRESS || action == Input::REPEAT)
         {
             if(key == Input::KEY_W)
@@ -48,8 +48,17 @@ namespace OpenGL
             std::cout << "Unable to capture the window att" << std::endl;
         }
 
-        OpenGL_Window *temp = (OpenGL_Window*)glfwGetWindowUserPointer(window);
+        if(btn == Input::KEY_LEFT && action == Input::PRESS)
+        {
+            std::cout << "Left" << std::endl;
+        }
+        else if(btn == Input::KEY_RIGHT && action == Input::PRESS)
+        {
+            std::cout << "Right" << std::endl;
+        }
 
+        OpenGL_Window *temp = (OpenGL_Window*)glfwGetWindowUserPointer(window);
+        temp->GetCamera()->m_isActive = !temp->GetCamera()->m_isActive;
     }
 
     static void static_cursor_pos_callback(GLFWwindow *window, double x, double y)

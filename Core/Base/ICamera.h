@@ -33,6 +33,8 @@ namespace Interface
             SetCameraProp(camProp);
         }
 
+        virtual ~ICamera()  {   }
+
         Mat4 GetViewMatrix()
         {
             return glm::lookAt(m_transform.position, m_transform.position + m_camProp.front, m_camProp.up);

@@ -10,6 +10,7 @@ namespace OpenGL
     {
         public:
         OpenGL_Camera(CameraProp &camProp);
+        ~OpenGL_Camera()    {   }
 
         protected:
         void processKeyboardNavgiation(Transformation::Movement direction, float delta = 1/60.0) override;
