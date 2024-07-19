@@ -3,14 +3,15 @@
 
 #include<iostream>
 
-typedef struct fVec2
+template<typename T>
+struct Vec2
 {
     public:
-    fVec2(float val)   {    x = val;   y = val;   }
-    fVec2(float _x, float _y)   {   x = _x; y = _y; }
-    fVec2(fVec2 &rhs)   {   x = rhs.x;  y = rhs.y; }
+    Vec2(T val)   {    x = val;   y = val;   }
+    Vec2(T _x, T _y)   {   x = _x; y = _y; }
+    Vec2(Vec2 &rhs)   {   x = rhs.x;  y = rhs.y; }
 
-    fVec2& operator=(const fVec2 &rhs)
+    Vec2& operator=(const Vec2 &rhs)
     {
         x = rhs.x;  y = rhs.y;
         return *this;
@@ -18,19 +19,20 @@ typedef struct fVec2
 
     union
     {
-        struct  {   float u, v; };
-        struct  {   float x, y; };
+        struct  {   T u, v; };
+        struct  {   T x, y; };
     };
-}fVec2;
+};
 
-typedef struct fVec3
+template<typename T>
+struct Vec3
 {
     public:
-    fVec3(float val)   {  x = val;   y = val;   z = val;   }
-    fVec3(float _x, float _y, float _z = 1)   {  x = _x; y = _y; z = _z; }
-    fVec3(fVec3 &rhs)   {  x = rhs.x;  y = rhs.y;  z = rhs.z;; } 
+    Vec3(T val)   {  x = val;   y = val;   z = val;   }
+    Vec3(T _x, T _y, T _z = 1)   {  x = _x; y = _y; z = _z; }
+    Vec3(Vec3 &rhs)   {  x = rhs.x;  y = rhs.y;  z = rhs.z;; } 
 
-    fVec3& operator=(const fVec3 &rhs)
+    Vec3& operator=(const Vec3 &rhs)
     {
         x = rhs.x;  y = rhs.y;  z = rhs.z;;  
         return *this;
@@ -38,19 +40,20 @@ typedef struct fVec3
 
     union
     {
-        struct  {   float r, g, b;   };
-        struct  {   float x, y, z;   };
+        struct  {   T r, g, b;   };
+        struct  {   T x, y, z;   };
     };
-}fVec3;
+};
 
-typedef struct fVec4
+template<typename T>
+struct Vec4
 {
     public:
-    fVec4(float val)   {  x = val;   y = val;   z = val;   w = val;   }
-    fVec4(float _x, float _y, float _z = 1, float _w = 1)   {  x = _x; y = _y; z = _z; w = _w; }
-    fVec4(fVec4 &rhs)   {   x = rhs.x;  y = rhs.y;  z = rhs.z;  w = rhs.w;  } 
+    Vec4(T val)   {  x = val;   y = val;   z = val;   w = val;   }
+    Vec4(T _x, T _y, T _z = 1, T _w = 1)   {  x = _x; y = _y; z = _z; w = _w; }
+    Vec4(Vec4 &rhs)   {   x = rhs.x;  y = rhs.y;  z = rhs.z;  w = rhs.w;  } 
 
-    fVec4& operator=(const fVec4 &rhs)
+    Vec4& operator=(const Vec4 &rhs)
     {
         x = rhs.x;  y = rhs.y;  z = rhs.z;  w = rhs.w;  
         return *this;
@@ -58,12 +61,23 @@ typedef struct fVec4
 
     union
     {
-        struct  {   float r, g, b, a;   };
-        struct  {   float x, y, z, w;   };
+        struct  {   T r, g, b, a;   };
+        struct  {   T x, y, z, w;   };
     };
-}fVec4;
+};
 
+typedef Vec2<float> fVec2;
+typedef Vec2<int> iVec2;
+typedef Vec2<uint32_t> uiVec2;
+
+typedef Vec3<float> fVec3;
+typedef Vec3<int> iVec3;
+typedef Vec3<uint32_t> uiVec3;
 typedef fVec3 Color3;
+
+typedef Vec4<float> fVec4;
+typedef Vec4<int> iVec4;
+typedef Vec4<uint32_t> uiVec4;
 typedef fVec4 Color4;
 
 typedef struct String
