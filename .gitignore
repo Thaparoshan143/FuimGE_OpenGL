@@ -1,0 +1,6 @@
+/builds/Exe/*
+/builds/*.obj
+/builds/*.txt
+.vscode
+.DS_Store
+*/**/test
