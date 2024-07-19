@@ -1581,4 +1581,71 @@ namespace External
         return m;
     }
 }
+
+namespace External
+{
+    #define BUFFER_SIZE_INITIAL 512
+    #define POSITION_COUNT 3
+    #define NORMAL_COUNT 3
+    #define TEXCORD_COUNT 2
+
+    class FastObjWrapper
+    {
+        public:
+        FastObjWrapper(std::string path) : m_path(path)
+        {
+            m_mesh = fast_obj_read(m_path.c_str());
+        }
+
+        std::vector<float> GetVertexPosition()
+        {
+            std::vector<float> tempVer;
+
+            float *iterator = m_mesh->positions;
+            for(int i=0;i<m_mesh->position_count*POSITION_COUNT;++i)
+            {
+                tempVer.push_back(*(iterator+i));
+            }
+
+            return tempVer;
+        }
+
+        std::vector<float> GetVertexNormal()
+        {
+            std::vector<float> tempVer;
+
+            float *iterator = m_mesh->normals;
+            for(int i=0;i<m_mesh->normal_count*NORMAL_COUNT;++i)
+            {
+                tempVer.push_back(*(iterator+i));
+            }
+
+            return tempVer;
+        }
+
+        std::vector<uint32_t> GetIndex()
+        {
+            std::vector<uint32_t> tempVer;
+
+            fastObjIndex *iterator = m_mesh->indices;
+
+            // flatten of 3 elements
+            for(int i=0;i<m_mesh->index_count;++i)
+            {
+                tempVer.push_back((*(iterator + i)).n);
+                tempVer.push_back((*(iterator + i)).p);
+                tempVer.push_back((*(iterator + i)).t);
+            }
+
+            return tempVer;
+        }
+
+        inline uint32_t GetIndexCount() {   return m_mesh->index_count*3;    }
+
+        protected:
+        fastObjMesh *m_mesh;
+        std::string m_path;
+    };
+}
+
 #endif
