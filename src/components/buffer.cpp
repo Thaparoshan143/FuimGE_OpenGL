@@ -4,6 +4,9 @@
 #include<interface.h>
 #include<glad.h>
 
+// 256 buffer reserve by default if not mentioned
+#define INIT_BUFFER_RESERVE 256
+
 // Buffer storage format - position..color..uv..normal
 // 3 bit mask arrangment to find appropriate ..
 typedef enum BufferFormat
@@ -37,37 +40,36 @@ typedef enum BufferFormat
 
 namespace Component
 {
-    class VertexBufferObject : public Interface::IBufferBase<float>
+    template<class T, uint32_t buffType>
+    class BufferObject
     {
         public:
-        VertexBufferObject(uint32_t reserveSize = INIT_BUFFER_RESERVE)
+        BufferObject(uint32_t type = buffType, uint32_t reserveSize = INIT_BUFFER_RESERVE)
         {
             glGenBuffers(1, &this->m_bufferHandle);
-            m_usage = GL_DYNAMIC_DRAW;
+            m_type = type;
+            m_buffer.reserve(INIT_BUFFER_RESERVE);
         }
 
-        uint32_t Bind() override    {   glBindBuffer(GL_ARRAY_BUFFER, this->m_bufferHandle);    return m_bufferHandle;    }
-        void Unbind() override  {   glBindBuffer(GL_ARRAY_BUFFER, 0);  }
-        void Offload() override {   Bind(); glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m_buffer.size(), this->m_buffer.data(), m_usage);  }
-        void ReserveBuffer(uint32_t size, uint32_t loadMode = GL_DYNAMIC_DRAW);
-		void LoadSubBuffer(uint32_t size, float *data);
+        uint32_t GetBufferHandle() const                {   return m_bufferHandle;  }
+        std::vector<T>& GetBuffer()                     {   return m_buffer;    }
+        void Clear()                                    {   m_buffer.clear();   }
+        void AppendBuffer(std::vector<T> &buffer)       {   m_buffer.insert(m_buffer.end(), buffer.begin(), buffer.end());    }
+        void AppendBuffer(T *buffer, uint32_t size)     {   m_buffer.insert(m_buffer.end(), buffer, buffer+size);   }
+
+        inline uint32_t Bind() const                    {   glBindBuffer(m_type, this->m_bufferHandle);    return m_bufferHandle;    }
+        void Unbind() const                             {   glBindBuffer(m_type, 0);  }
+        void Offload(uint32_t usage=GL_STATIC_DRAW)     {   Bind(); glBufferData(m_type, sizeof(T)*m_buffer.size(), m_buffer.data(), usage);  }
+		void LoadSubBuffer(T *data, uint32_t size)      {   Bind(); glBufferSubData(m_type, 0, sizeof(T) * size, data); }
+        void ReserveBuffer(uint32_t size, uint32_t usage = GL_STATIC_DRAW)  {   Bind();    glBufferData(m_type, sizeof(T) * size, NULL, usage);    }
+
+        protected:
+        std::vector<T> m_buffer;
+        uint32_t m_bufferHandle, m_type;
     };
 
-    class IndexBufferObject : public Interface::IBufferBase<uint32_t>
-    {
-        public:
-        IndexBufferObject(uint32_t reserveSize = INIT_BUFFER_RESERVE)
-        {
-            glGenBuffers(1, &this->m_bufferHandle);
-            m_usage = GL_DYNAMIC_DRAW;
-        }
-
-        uint32_t Bind() override    {   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_bufferHandle);    return m_bufferHandle;    }
-        void Unbind() override  {   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);   }
-        void Offload() override {   Bind(); glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t)*m_buffer.size(), this->m_buffer.data(), m_usage);    }
-        void ReserveBuffer(uint32_t size, uint32_t loadMode = GL_DYNAMIC_DRAW);
-		void LoadSubBuffer(uint32_t size, uint32_t *data);
-    };
+    typedef BufferObject<float, GL_ARRAY_BUFFER> VertexBufferObject;
+    typedef BufferObject<uint32_t, GL_ELEMENT_ARRAY_BUFFER> IndexBufferObject;
 
     class VertexArrayObject 
     {
@@ -80,21 +82,26 @@ namespace Component
 
         uint32_t Bind() { glBindVertexArray(m_bufferHandle);  return m_bufferHandle;  }
         void Unbind()   {   glBindVertexArray(0);   }
-        void EnableVertexAttrMan(uint32_t count);
+        void EnableVertexAttrMan(uint32_t count)
+        {
+            Bind();
+            glVertexAttribPointer(0, count, GL_FLOAT, GL_FALSE, count * sizeof(float), 0);
+            glEnableVertexAttribArray(0);
+        }
         void EnableVertexAttrib()
         {
             Bind();
 
             // taking all the vertex data and organizing for the shader use case.. first position, color, uv texture, 
             int verStride = getVBOStride();
-            std::cout << "Stride Count : " << verStride << std::endl;
-            std::cout << "### Position" << std::endl;
+            // std::cout << "Stride Count : " << verStride << std::endl;
+            // std::cout << "### Position" << std::endl;
             glVertexAttribPointer(0, getMask(BUFFER_MASKPPP), GL_FLOAT, GL_FALSE, sizeof(float)*verStride, (const void*)0);
             glEnableVertexAttribArray(0);
 
             if(getMask(BUFFER_MASKRGB))
             {
-                std::cout << "### RGB" << std::endl;
+                // std::cout << "### RGB" << std::endl;
                 uint colOffset = getMask(BUFFER_MASKPPP)*sizeof(float);
                 glVertexAttribPointer(1, ((getMask(BUFFER_MASKRGB))>>3), GL_FLOAT, GL_FALSE, sizeof(float)*verStride, (const void*)(colOffset));
                 glEnableVertexAttribArray(1);
@@ -102,7 +109,7 @@ namespace Component
             
             if(getMask(BUFFER_MASKTEX))
             {
-                std::cout << "### UV" << std::endl;
+                // std::cout << "### UV" << std::endl;
                 uint texOffset = (getMask(BUFFER_MASKPPP)+(getMask(BUFFER_MASKRGB)>>3))*sizeof(float);
                 glVertexAttribPointer(2, ((getMask(BUFFER_MASKTEX)>>6)), GL_FLOAT, GL_FALSE, sizeof(float)*verStride, (const void*)(texOffset));
                 glEnableVertexAttribArray(2);
@@ -110,16 +117,14 @@ namespace Component
 
             if(getMask(BUFFER_MASKNORMAL))
             {
-                std::cout << "### Normal" << std::endl;
+                // std::cout << "### Normal" << std::endl;
                 uint norOffset = (getMask(BUFFER_MASKPPP)+(getMask(BUFFER_MASKRGB)>>3)+(getMask(BUFFER_MASKTEX)>>6))*sizeof(float);
                 glVertexAttribPointer(3, ((getMask(BUFFER_MASKNORMAL)>>9)), GL_FLOAT, GL_FALSE, sizeof(float)*verStride, (const void*)(norOffset));
                 glEnableVertexAttribArray(3);
             }
         }
-        void AppendBufferLink(VertexBufferObject *vbo, IndexBufferObject *ibo);
-        void SetActiveVBOBufferHandle(uint32_t vboBufferHandle);
-        uint32_t GetBufferHandle() const {  return m_bufferHandle; }
-        void SetFormat(BufferFormat bf) {   m_format = bf;  }
+        uint32_t GetBufferHandle() const    {  return m_bufferHandle; }
+        void SetFormat(BufferFormat bf)     {   m_format = bf;  }
 
         protected:
         uint32_t m_bufferHandle;
