@@ -54,7 +54,6 @@ namespace Component
         void SetBgColor(Color4 col) {   SetBgColor(col.r, col.g, col.b, col.a);   }
         void SetBgColor(float r, float g, float b, float a) {   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); glClearColor(r, g, b, a);   }
         void SwapFrameBuffer()   {   glfwSwapBuffers(m_window);  }
-        uint32_t KeyStatus(uint32_t keyCode)    {   return glfwGetKey(m_window, GLFW_KEY_SPACE);   }
 
         GLFWwindow *m_window;
         WindowProp m_winProp;
