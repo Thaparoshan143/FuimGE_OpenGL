@@ -48,8 +48,8 @@ namespace Component
         }
         ~Window()   {   glfwTerminate();    }
 
-        const GLFWwindow* GetWindowHandle()   {   return   m_window;   }
-        const WindowProp GetWindowProp()  {   return m_winProp;    }
+        GLFWwindow* GetWindowHandle()   {   return   m_window;   }
+        WindowProp GetWindowProp()  {   return m_winProp;    }
         inline bool ShouldCloseWindow() {   return glfwWindowShouldClose(m_window);   }
         void SetBgColor(Color4 col) {   SetBgColor(col.r, col.g, col.b, col.a);   }
         void SetBgColor(float r, float g, float b, float a) {   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); glClearColor(r, g, b, a);   }
