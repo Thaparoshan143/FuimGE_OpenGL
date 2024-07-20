@@ -2,6 +2,7 @@
 #include<log.cpp>
 #include<entity.cpp>
 #include<timer.cpp>
+#include<renderer.cpp>
 #define FAST_OBJ_IMPLEMENTATION
 #include<fast_obj.h>
 #include<imgui.h>
@@ -74,7 +75,21 @@ class GEApplication : public Component::Application
 		ibo.Offload();
 		vao.EnableVertexAttrib();
 
+		Component::CameraProp camProp;
+		camProp.worldUp = fVec3(0, 1, 0);
+		camProp.pitch = 0;
+		camProp.yaw = -90;
+		camProp.speed = 0.5f;
+		camProp.sensitivity = 0.2f;
+		camProp.zoom = 45;
+		Component::Renderer mainRenderer(camProp);
+		mainRenderer.m_camera.m_transform.position = fVec3(0, 0, 8);
+
 		bool show_demo_window = true;
+
+		Util::_print_mat4(mainRenderer.m_camera.GetProjectionMatrix().data);
+		std::cout << "------------------------------- -------------------------------" << std::endl;
+		Util::_print_mat4(mainRenderer.m_camera.GetViewMatrix().data);
 
 		while(!m_window.ShouldCloseWindow())
 		{
@@ -82,6 +97,10 @@ class GEApplication : public Component::Application
 			// (Your code calls glfwPollEvents())
 			// ...
 			// Start the Dear ImGui frame
+			if(ImGui::IsKeyDown(ImGuiKey_Space))
+			{
+				std::cout << "Space pressed" << std::endl;
+			}
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
@@ -113,8 +132,11 @@ class GEApplication : public Component::Application
 			m_window.SetBgColor(DEFAULT_WINDOW_BG);
 			vao.Bind();
 			shader.UseProgram();
+			shader.SetUniformMat4("view", mainRenderer.m_camera.GetViewMatrix());
+			shader.SetUniformMat4("projection", mainRenderer.m_camera.GetProjectionMatrix());
+			shader.SetUniformMat4("model", mainRenderer.m_camera.GetModelMatrix());
 			glDrawElements(GL_TRIANGLES, 100, GL_UNSIGNED_INT, 0);
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			// ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 			// (Your code calls glfwSwapBuffers() etc.)
 			m_window.SwapFrameBuffer();
 		}
