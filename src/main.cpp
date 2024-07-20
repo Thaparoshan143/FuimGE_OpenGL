@@ -9,6 +9,8 @@
 #include<imgui_impl_glfw.h>
 #include<imgui_impl_opengl3.h>
 
+#define FONT_SIZE 16
+
 class GEApplication : public Component::Application
 {
 	public:
@@ -28,14 +30,14 @@ class GEApplication : public Component::Application
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+    	glfwSwapInterval(1); // Enable vsync
 		// Initializing the ImGui and its context 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
+		m_io = ImGui::GetIO();
+		m_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		m_io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		m_io.Fonts->AddFontFromFileTTF("./res/Fonts/Roboto.ttf", FONT_SIZE);
    	 	ImGui::StyleColorsDark();
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(this->m_window.GetWindowHandle(), true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
@@ -105,22 +107,21 @@ class GEApplication : public Component::Application
 				ImGui::End();
 			}
 				
-			// vao.Bind();
-			// shader.UseProgram();
-			// glDrawElements(GL_TRIANGLES, 100, GL_UNSIGNED_INT, 0);
-	
-			// delay();
-			// glfwPollEvents();
-
-			// Rendering
-			// (Your code clears your framebuffer, renders your other stuff etc.)
 			ImGui::Render();
+			glfwGetFramebufferSize(m_window.GetWindowHandle(), &m_window.m_winProp.width, &m_window.m_winProp.height);
+        	glViewport(0, 0, m_window.m_winProp.width, m_window.m_winProp.height);
 			m_window.SetBgColor(DEFAULT_WINDOW_BG);
+			vao.Bind();
+			shader.UseProgram();
+			glDrawElements(GL_TRIANGLES, 100, GL_UNSIGNED_INT, 0);
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 			// (Your code calls glfwSwapBuffers() etc.)
 			m_window.SwapFrameBuffer();
 		}
 	}
+
+	protected:
+	ImGuiIO m_io;
 };
 
 
