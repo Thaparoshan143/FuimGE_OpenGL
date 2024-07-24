@@ -160,5 +160,49 @@ namespace Util
             std::cout << std::setprecision(5) << *(data+i) << ",\t" << *(data+i+1) << seperator;
         }
     }
+
+    float* get_grid_pointxz_ind(fVec2 start, fVec2 end, fVec2 gridCount)
+    {
+        int pointCount = ((gridCount.x + 2 + gridCount.y + 2)*2)*3;
+        // std::cout << "Point Count : " << pointCount << std::endl;
+        float *temp = new float[pointCount];
+        fVec2 offset = fVec2((end.x - start.x) / (gridCount.x + 1), (end.y - start.y) / (gridCount.y + 1));
+        // std::cout << "Offset : " << offset.x << ", " << offset.y << std::endl;
+
+        // populating x coordinates
+        for(int i = 0; i<gridCount.x+2;++i)
+        {
+            *(temp++) = start.x + i * offset.x;
+            temp++;
+            *(temp++) = start.y;
+            *(temp++) = start.x + i * offset.x;
+            temp++;
+            *(temp++) = end.y;
+            // std::cout << *(temp-2) << "\t, " << *(temp-1) << std::endl;
+        }
+        // seperator("-", 100);
+
+        // populating y coordinates
+        for(int i = 0; i<gridCount.y+2;++i)
+        {
+            *(temp++) = start.x;
+            temp++;
+            *(temp++) = start.y + i * offset.y;
+            *(temp++) = end.x;
+            temp++;
+            *(temp++) = start.y + i * offset.y;
+            // std::cout << *(temp-2) << "\t, " << *(temp-1) << std::endl;
+        }
+        // seperator("-", 100);
+        
+        // std::cout << " => first : " << *(temp-pointCount) << std::endl;
+        // seperator(" * ",30);
+        return (temp-pointCount);
+    }
+
+    uint get_grid_xz_size(fVec2 gridCount)
+    {
+        return ((gridCount.x + 2 + gridCount.y + 2)*2)*3;
+    }
 }
 #endif
