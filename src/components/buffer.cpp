@@ -53,6 +53,7 @@ namespace Component
 
         uint32_t GetBufferHandle() const                {   return m_bufferHandle;  }
         std::vector<T>& GetBuffer()                     {   return m_buffer;    }
+        uint32_t GetBufferSize()                        {   return m_buffer.size(); }
         void Clear()                                    {   m_buffer.clear();   }
         void AppendBuffer(std::vector<T> &buffer)       {   m_buffer.insert(m_buffer.end(), buffer.begin(), buffer.end());    }
         void AppendBuffer(T *buffer, uint32_t size)     {   m_buffer.insert(m_buffer.end(), buffer, buffer+size);   }
