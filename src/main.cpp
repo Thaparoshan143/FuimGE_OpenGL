@@ -15,10 +15,23 @@
 class GEApplication : public Component::Application
 {
 	public:
-	GEApplication(Component::ApplicationProp appProp) : Application(appProp)	{	}
+	GEApplication(Component::ApplicationProp appProp) : Application(appProp)
+	{
+		Component::CameraProp camProp;
+		camProp.worldUp = fVec3(0, 1, 0);
+		camProp.pitch = -25;
+		camProp.yaw = -135;
+		camProp.speed = Math::VERYFAST * CAM_SPEEDMULTIPLIER;
+		camProp.sensitivity = Math::HIGH * CAM_SENMULTIPLIER;
+		camProp.zoom = 45;
+		Component::GridProp gridProp({-10, 10}, {10, -10}, {19, 19});
+		m_renderer = new Component::Renderer(camProp, gridProp);
+		m_renderer->GetCamera().m_transform.position = fVec3(5, 2, 5);
+	}
 
 	~GEApplication()	
 	{
+		delete m_renderer;
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
@@ -28,9 +41,10 @@ class GEApplication : public Component::Application
 	{	
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);   
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
+		// glEnable(GL_CULL_FACE);
+		// glCullFace(GL_BACK);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     	glfwSwapInterval(1); // Enable vsync
 		// Initializing the ImGui and its context 
 		IMGUI_CHECKVERSION();
@@ -47,96 +61,45 @@ class GEApplication : public Component::Application
 
 	void Loop() override
 	{
+		bool show_demo_window = true;
+		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		float *pos = new float[3];
+		float *rot = new float[3];
+		float *scale = new float[3];
+		std::string objectName = "Default";
+		bool show_inspector = true;
+
+		External::FastObjWrapper tempObj("./res/Models/sphere.obj");
 		Component::VertexArrayObject vao(BufferFormat::PPP);
 		Component::VertexBufferObject vbo;
 		Component::IndexBufferObject ibo;
 		Component::Shader shader("./res/Shaders/Basic/", "ver.shader", "frag.shader");
 		shader.CompileProgram();
-
-		External::FastObjWrapper tempObj("./res/Models/cube.obj");
-
 		vao.Bind();
-		std::vector<float> flattenVert = tempObj.GetVertexPosition();
-		std::cout << "Position Count : " << flattenVert.size() << std::endl;
-		Util::print_float_xyz(flattenVert.data(), flattenVert.size());
-		std::cout << "------------------------------- -------------------------------" << std::endl;
-		vbo.AppendBuffer(flattenVert);
+		auto tempVert = tempObj.GetVertexPosition();
+		vbo.AppendBuffer(tempVert);
 		vbo.Offload();
-
-		std::vector<uint32_t> flattenIndex = tempObj.GetIndex();
-		std::cout << "Index : " << flattenIndex.size() << std::endl;
-		for(int i=0;i<flattenIndex.size();i+=3)
-		{
-			std::cout << std::setprecision(5) << *(flattenIndex.data() + i) << ",\t" << *(flattenIndex.data() + i + 1) << ",\t" << *(flattenIndex.data() + i + 2) << std::endl;
-		}
-		std::cout << "------------------------------- -------------------------------" << std::endl;
-		std::cout << "Index Count : " << flattenIndex.size() << std::endl;
-		ibo.AppendBuffer(flattenIndex);
+		auto tempIbo = tempObj.GetIndex();
+		ibo.AppendBuffer(tempIbo);
 		ibo.Offload();
 		vao.EnableVertexAttrib();
 
-		Component::CameraProp camProp;
-		camProp.worldUp = fVec3(0, 1, 0);
-		camProp.pitch = 0;
-		camProp.yaw = -90;
-		camProp.speed = 0.5f;
-		camProp.sensitivity = 0.2f;
-		camProp.zoom = 45;
-		Component::Renderer mainRenderer(camProp);
-		mainRenderer.m_camera.m_transform.position = fVec3(0, 0, 8);
-
-		bool show_demo_window = true;
-
-		Util::_print_mat4(mainRenderer.m_camera.GetProjectionMatrix().data);
-		std::cout << "------------------------------- -------------------------------" << std::endl;
-		Util::_print_mat4(mainRenderer.m_camera.GetViewMatrix().data);
 
 		while(!m_window.ShouldCloseWindow())
 		{
         	glfwPollEvents();
-			// (Your code calls glfwPollEvents())
-			// ...
-			// Start the Dear ImGui frame
-			if(ImGui::IsKeyDown(ImGuiKey_Space))
-			{
-				std::cout << "Space pressed" << std::endl;
-			}
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
-			ImGui::ShowDemoWindow(); // Show demo window! :)
 
-			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-			{
-				static float f = 0.0f;
-				static int counter = 0;
-
-				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-
-				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-
-				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-					counter++;
-				ImGui::SameLine();
-				ImGui::Text("counter = %d", counter);
-
-				ImGui::End();
-			}
-				
-			ImGui::Render();
 			glfwGetFramebufferSize(m_window.GetWindowHandle(), &m_window.m_winProp.width, &m_window.m_winProp.height);
         	glViewport(0, 0, m_window.m_winProp.width, m_window.m_winProp.height);
 			m_window.SetBgColor(DEFAULT_WINDOW_BG);
+
 			vao.Bind();
 			shader.UseProgram();
-			shader.SetUniformMat4("view", mainRenderer.m_camera.GetViewMatrix());
-			shader.SetUniformMat4("projection", mainRenderer.m_camera.GetProjectionMatrix());
-			shader.SetUniformMat4("model", mainRenderer.m_camera.GetModelMatrix());
-			glDrawElements(GL_TRIANGLES, 100, GL_UNSIGNED_INT, 0);
-			// ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			shader.SetUniformMat4("view", m_renderer->GetCamera().GetViewMatrix());
+			shader.SetUniformMat4("projection", m_renderer->GetCamera().GetProjectionMatrix());
+			shader.SetUniformMat4("model", m_renderer->GetCamera().GetModelMatrix());
+			glDrawElements(GL_TRIANGLES, tempObj.GetIndexCount(), GL_UNSIGNED_INT, 0);
+			m_renderer->Render();
 			// (Your code calls glfwSwapBuffers() etc.)
 			m_window.SwapFrameBuffer();
 		}
@@ -144,6 +107,7 @@ class GEApplication : public Component::Application
 
 	protected:
 	ImGuiIO m_io;
+	Component::Renderer *m_renderer;
 };
 
 
