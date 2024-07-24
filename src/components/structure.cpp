@@ -54,6 +54,22 @@ struct Vec3
         return Vec3(x+rhs.x, y+rhs.y, z+rhs.z);
     }
 
+    Vec3 operator-=(const Vec3 &rhs)
+    {
+        x -= rhs.x;
+        y -= rhs.y;
+        z -= rhs.z;
+        return *this;
+    }
+
+    Vec3 operator+=(const Vec3 &rhs)
+    {
+        x += rhs.x;
+        y += rhs.y;
+        z += rhs.z;
+        return *this;
+    }
+
     union
     {
         struct  {   T r, g, b;   };
