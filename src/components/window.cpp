@@ -4,6 +4,7 @@
 #include<glad.h>
 #include<glfw3.h>
 #include<structure.cpp>
+#include<renderer.cpp>
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
@@ -45,6 +46,11 @@ namespace Component
             glfwSetWindowUserPointer(this->m_window, this);
 
             // callbacks
+            glfwSetKeyCallback(this->m_window, static_key_callback);
+            glfwSetScrollCallback(this->m_window, static_scroll_callback);
+            glfwSetMouseButtonCallback(this->m_window, static_mousekey_callback);
+            glfwSetCursorPosCallback(this->m_window, static_cursor_pos_callback);
+            glfwSetCursorEnterCallback(this->m_window, static_cursor_enter_callback);
         }
         ~Window()   {   glfwTerminate();    }
 
