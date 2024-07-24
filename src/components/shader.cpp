@@ -87,11 +87,11 @@ namespace Component
         // Move to readFile binary later
 		const char* parseShader(std::string fileName)
         {
-            std::ifstream tempStream(std::string(m_dir) + std::string(fileName), std::ios_base::in);
+            std::ifstream tempStream(std::string(m_dir + fileName), std::ios_base::in);
             std::stringstream tempBuffer;
             if(!tempStream.is_open())
             {
-                std::cout << "Failed to load file for read !" << std::endl;
+                std::cout << "Failed to load file for read ! : " << m_dir + fileName << std::endl;
             }
             tempBuffer << tempStream.rdbuf();
             tempStream.close();
