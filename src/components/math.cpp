@@ -28,14 +28,14 @@ namespace Math
 
     static float dot_product(fVec3 a, fVec3 b)
     {
-        return (a.x*a.y + a.y*b.y + a.z*b.z);
+        return (a.x*b.x + a.y*b.y + a.z*b.z);
     }
 
     static fVec3 cross_product(fVec3 a, fVec3 b)
     {
         fVec3 result;
         result.x = a.y * b.z - b.y * a.z;
-        result.y = a.x * b.z - b.x * a.z;
+        result.y = a.z * b.x - b.z * a.x;
         result.z = a.x * b.y - b.x * a.y;
         return result;
     }
@@ -61,6 +61,33 @@ namespace Math
             float transform[9];
         };
     };
+
+    typedef enum Movement
+    {
+        NONE = 0,
+        FORWARD,
+        BACKWARD,
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN
+    }Movement;
+
+    typedef enum Speed
+    {
+        SLOW = 1,
+        MEDIUM = 1 << 2,
+        FAST = 1 << 3,
+        VERYFAST = 1 << 4
+    }Speed;
+
+    typedef enum Sensitivity
+    {
+        LOW = 1,
+        AVERAGE = 2, 
+        HIGH = 3,
+        VERYHIGH = 4
+    }Sensitivity;
 
 
     // The matrix here is the implementation of other library with wrapper so have to inspect if something breaks (source : check ./src/external/math/math_3d.h)
@@ -291,6 +318,12 @@ namespace Math
             z.x, z.y, z.z, -Math::dot_product(from, z),
             0,   0,   0,    1
         );
+    }
+
+    template<typename T>
+    static T Clamp(T val, T low, T high)
+    {
+        return val < low ? low : val > high ? high : val;
     }
 }
 #endif
