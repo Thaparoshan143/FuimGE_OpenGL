@@ -2,6 +2,7 @@
 #define APPLICATION_CPP
 
 #include<window.cpp>
+#include<renderer.cpp>
 
 #define DELAY_TIME 1/24.0
 #define SEC_CLOCK()	((double)clock() / CLOCKS_PER_SEC)
@@ -28,6 +29,7 @@ namespace Component
 
         virtual ~Application()  {   }
         virtual void Initialize()   {   }
+
         virtual void Loop()
         {
             while(!m_window.ShouldCloseWindow())
@@ -39,7 +41,8 @@ namespace Component
                 glfwPollEvents();
             }
         }
-
+	    
+        Renderer *m_renderer;
         Window m_window;
     };
 }

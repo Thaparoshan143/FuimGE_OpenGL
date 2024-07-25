@@ -20,8 +20,8 @@ namespace Component
     #define CAM_Z_NEAR 0.1f
     #define CAM_Z_FAR 100.0f
 
-    #define CAM_SENMULTIPLIER 0.01
-    #define CAM_SPEEDMULTIPLIER 2.5f
+    #define CAM_SENMULTIPLIER 0.03
+    #define CAM_SPEEDMULTIPLIER 4.0f
 
     struct CameraProp
     {
@@ -51,9 +51,9 @@ namespace Component
             return Math::LookAt(m_transform.position, m_transform.position + m_camProp.front, m_camProp.up);
         }
 
-        static Math::Mat4 GetProjectionMatrix(fVec2 screenSize = fVec2(800, 600))
+        static Math::Mat4 GetProjectionMatrix()
         {
-            return Math::Prespective(ToRadian(m_camProp.zoom), screenSize.x/(float)screenSize.y, CAM_Z_NEAR, CAM_Z_FAR);
+            return Math::Prespective(ToRadian(m_camProp.zoom), m_screenSize.x/(float)m_screenSize.y, CAM_Z_NEAR, CAM_Z_FAR);
         }
 
         static Math::Mat4 GetModelMatrix()
@@ -66,11 +66,10 @@ namespace Component
 
         static void ProcessKeyNav(Input::KeyEvent key)
         {
-            if(!m_isActive)
+            if(!m_isNavActive)
             {
                 return;
             }
-
             float vel = m_camProp.speed * ImGui::GetIO().DeltaTime;
             Math::Movement dir = m_keyNavMap[key.GetKey()];
             // std::cout << "Key got here : " << char(key.GetKey()) << std::endl;
@@ -103,11 +102,11 @@ namespace Component
 
         static void ProcessMouseScroll(float x, float y)
         {
-            if(!m_isActive)
+            if(!m_isNavActive)
             {
                 return;
             }
-            m_camProp.zoom -= sqrt(x*x + y*y);
+            m_camProp.zoom -= y;
             m_camProp.zoom = Math::Clamp<float>(m_camProp.zoom, CAM_ZOOM_LOW, CAM_ZOOM_HIGH);
         }
 
@@ -151,19 +150,22 @@ namespace Component
         friend class Renderer;
         public:
         static Math::Transform m_transform;
+        static fVec2 m_screenSize;
         static CameraProp m_camProp;
-        static bool m_isActive;
+        static bool m_isActive, m_isNavActive;
         static std::map<int, Math::Movement> m_keyNavMap;
     };
 
     Math::Transform Camera::m_transform;
     CameraProp Camera::m_camProp;
-    bool Camera::m_isActive = true;
+    fVec2 Camera::m_screenSize = fVec2(800, 600);
+    bool Camera::m_isActive = false;
+    bool Camera::m_isNavActive = true;
     std::map<int, Math::Movement> Camera::m_keyNavMap;
 
     struct GridProp
     {
-        GridProp(fVec2 s = fVec2(-1, 1), fVec2 e = fVec2(1, -1), fVec2 gc = fVec2(9), Color4 col = Color4(1, 1, 1, 1))
+        GridProp(fVec2 s = fVec2(-1, 1), fVec2 e = fVec2(1, -1), fVec2 gc = fVec2(9), Color4 col = Color4(1, 0.5, 0.2, 1))
         {
             start = s;
             end = e;
@@ -194,7 +196,7 @@ namespace Component
             m_VBO.Bind();
             m_shader.UseProgram();
             m_shader.SetUniformMat4("view", Camera::GetViewMatrix());
-            m_shader.SetUniformMat4("projection", Camera::GetProjectionMatrix(fVec2(800, 600)));
+            m_shader.SetUniformMat4("projection", Camera::GetProjectionMatrix());
             m_shader.SetUniformMat4("model", Camera::GetModelMatrix());
             m_shader.SetUniformVec4("col", m_gridProp.color);
             glDrawArrays(GL_LINES, 0, m_VBO.GetBufferSize());
@@ -262,6 +264,10 @@ static void static_scroll_callback(GLFWwindow *window, double x, double y)
 
 static void static_mousekey_callback(GLFWwindow *window, int button, int action, int mods)
 {
+    if(action == GLFW_PRESS || action == GLFW_REPEAT)
+        Component::Camera::m_isActive = true;
+    else if(action == GLFW_RELEASE)
+        Component::Camera::m_isActive = false;
     // std::cout << "Mouse Button press : " << button << " | Action : " << action << " | Mod : " << mods << std::endl;
 }
 
@@ -295,12 +301,17 @@ static void static_cursor_enter_callback(GLFWwindow *window, int status)
     // std::cout << "Cursor enter the window status : " << status << std::endl;
     if(status)
     {
-        Component::Camera::m_isActive = true;
+        Component::Camera::m_isNavActive = true;
     }
     else
     {
-        Component::Camera::m_isActive = false;
+        Component::Camera::m_isNavActive = false;
     }
+}
+
+static void static_window_size_change(GLFWwindow *window, int width, int height)
+{
+    Component::Camera::m_screenSize = fVec2(width, height);
 }
 
 #endif

@@ -9,7 +9,8 @@
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
 #define DEFAULT_WINDOW_TITLE "Graphics Engine"
-#define DEFAULT_WINDOW_BG {0.55, 0, 0.9, 1}
+#define DEFAULT_WINDOW_BG {0.11, 0.11, 0.11, 1}
+// #define DEFAULT_WINDOW_BG {0.55, 0, 0.9, 1}
 
 namespace Component
 {
@@ -51,6 +52,7 @@ namespace Component
             glfwSetMouseButtonCallback(this->m_window, static_mousekey_callback);
             glfwSetCursorPosCallback(this->m_window, static_cursor_pos_callback);
             glfwSetCursorEnterCallback(this->m_window, static_cursor_enter_callback);
+            glfwSetWindowSizeCallback(this->m_window, static_window_size_change);
         }
         ~Window()   {   glfwTerminate();    }
 

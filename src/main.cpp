@@ -2,12 +2,7 @@
 #include<log.cpp>
 #include<entity.cpp>
 #include<renderer.cpp>
-#include<imgui.h>
-#define __OBJC__
-#include<imgui_impl_glfw.h>
-#include<imgui_impl_opengl3.h>
-
-#define FONT_SIZE 16
+#include<gui.cpp>
 
 class GEApplication : public Component::Application
 {
@@ -24,6 +19,7 @@ class GEApplication : public Component::Application
 		Component::GridProp gridProp({-10, 10}, {10, -10}, {19, 19});
 		m_renderer = new Component::Renderer(camProp, gridProp);
 		m_renderer->GetCamera().m_transform.position = fVec3(5, 2, 5);
+		m_GUIManager = new GUI::GUIManager(*this);
 	}
 
 	~GEApplication()	
@@ -38,17 +34,7 @@ class GEApplication : public Component::Application
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		m_io = ImGui::GetIO();
-		m_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		m_io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		m_io.Fonts->AddFontFromFileTTF("./res/Fonts/Roboto.ttf", FONT_SIZE);
-   	 	ImGui::StyleColorsDark();
-		// Setup Platform/Renderer backends
-		ImGui_ImplGlfw_InitForOpenGL(this->m_window.GetWindowHandle(), true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-		ImGui_ImplOpenGL3_Init("#version 330"); 
+		m_GUIManager->Init();
 	}
 
 	void Loop() override
@@ -57,11 +43,7 @@ class GEApplication : public Component::Application
 		shader.CompileProgram();
 
 		using namespace Component;
-		Model tempModel("./res/Models/cube.obj");
-		std::cout << "Model load Successful" << std::endl;
-
-		Texture texture("./res/Images/temp1.jpg");
-		texture.Offload();
+		Model tempModel("./res/Models/sphere.obj");
 
 		while(!m_window.ShouldCloseWindow())
 		{
@@ -70,20 +52,20 @@ class GEApplication : public Component::Application
 			m_window.SetBgColor(DEFAULT_WINDOW_BG);
 
 			m_renderer->Render();
-			texture.Bind();
 			shader.UseProgram();
 			shader.SetUniformMat4("view", m_renderer->GetCamera().GetViewMatrix());
 			shader.SetUniformMat4("projection", m_renderer->GetCamera().GetProjectionMatrix());
 			shader.SetUniformMat4("model", m_renderer->GetCamera().GetModelMatrix());
 			tempModel.Render();
 
+			m_GUIManager->Render();
 			m_window.SwapFrameBuffer();
 		}
 	}
 
 	protected:
 	ImGuiIO m_io;
-	Component::Renderer *m_renderer;
+	GUI::GUIManager *m_GUIManager;
 };
 
 

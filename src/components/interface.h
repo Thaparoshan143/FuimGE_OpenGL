@@ -17,4 +17,10 @@ namespace Interface
         bool isActive;
         Math::Transform transform;
     };
+
+    class IRenderableGUI
+    {
+        public:
+        virtual void Render() = 0;
+    };
 }

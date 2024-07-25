@@ -32,26 +32,26 @@ namespace Component
             unsigned int heightNr   = 1;
 
 
-            for(unsigned int i = 0; i < (*m_textures).size(); i++)
-            {
-                std::cout << "Cannot go inside" << std::endl;
-                (*m_textures)[i]->SetActiveSlot(GL_TEXTURE0 + i); // active proper texture unit before binding
-                // retrieve texture number (the N in diffuse_textureN)
-                std::string number;
-                if((*m_textures)[i]->IsOfType("texture_diffuse"))
-                    number = std::to_string(diffuseNr++);
-                else if((*m_textures)[i]->IsOfType("texture_specular"))
-                    number = std::to_string(specularNr++); // transfer unsigned int to string
-                else if((*m_textures)[i]->IsOfType("texture_normal"))
-                    number = std::to_string(normalNr++); // transfer unsigned int to string
-                else if((*m_textures)[i]->IsOfType("texture_height"))
-                    number = std::to_string(heightNr++); // transfer unsigned int to string
+            // for(unsigned int i = 0; i < (*m_textures).size(); i++)
+            // {
+            //     std::cout << "Cannot go inside" << std::endl;
+            //     (*m_textures)[i]->SetActiveSlot(GL_TEXTURE0 + i); // active proper texture unit before binding
+            //     // retrieve texture number (the N in diffuse_textureN)
+            //     std::string number;
+            //     if((*m_textures)[i]->IsOfType("texture_diffuse"))
+            //         number = std::to_string(diffuseNr++);
+            //     else if((*m_textures)[i]->IsOfType("texture_specular"))
+            //         number = std::to_string(specularNr++); // transfer unsigned int to string
+            //     else if((*m_textures)[i]->IsOfType("texture_normal"))
+            //         number = std::to_string(normalNr++); // transfer unsigned int to string
+            //     else if((*m_textures)[i]->IsOfType("texture_height"))
+            //         number = std::to_string(heightNr++); // transfer unsigned int to string
 
-                // now set the sampler to the correct texture unit
-                m_shader->SetUniformInt(((*m_textures)[i]->m_type + number), i);
-                // and finally bind the texture
-                (*m_textures)[i]->Bind();
-            }
+            //     // now set the sampler to the correct texture unit
+            //     m_shader->SetUniformInt(((*m_textures)[i]->m_type + number), i);
+            //     // and finally bind the texture
+            //     (*m_textures)[i]->Bind();
+            // }
             
             // draw mesh
             m_VAO.Bind();
@@ -83,7 +83,7 @@ namespace Component
         {
             for(uint i = 0;i<(uint)m_meshes.size();++i)
             {
-                m_meshes[i]->Render();
+                m_meshes[m_meshes.size() - i - 1]->Render();
             }
         }
 
