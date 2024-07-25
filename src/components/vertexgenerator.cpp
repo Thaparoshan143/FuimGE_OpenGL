@@ -5,6 +5,7 @@
 #include<iomanip> 
 
 #define TRIANGLE_VERTEX_COUNT 18
+#define TRIANGLE_VERTEX_PPPUV_COUNT 15
 #define QUAD_VERTEX_COUNT 36 // using two triangle method
 #define QUAD_IND_VERTEX_COUNT 24 // using Index method
 #define PER_VERTEX_MOD 6
@@ -34,6 +35,31 @@ namespace Util
             *(temp+6*i+4) = col.g;
             *(temp+6*i+5) = col.b;
         }
+
+        return temp;
+    }
+
+    float* get_triangle_buffer_uv(fVec3 pos, fVec3 dim, uint32_t uvCount = 2)
+    {
+        float *temp = new float[TRIANGLE_VERTEX_COUNT];
+        float hhei = dim.y/2.0;
+        float hwid = dim.x/2.0;
+        int i = 0, offset = 3 + uvCount;
+
+        *(temp+offset*i) =  pos.x-hwid;
+        *(temp+offset*i+1) =  pos.y-hhei;
+        *(temp+offset*i+3) = 0;
+        *(temp+offset*i+4) = 0;
+
+        *(temp+offset*(++i)) = pos.x+hwid;
+        *(temp+offset*i+1) =  pos.y-hhei;
+        *(temp+offset*i+3) = 0;
+        *(temp+offset*i+4) = 1;
+
+        *(temp+offset*(++i)) = pos.x;
+        *(temp+offset*i+1) =  pos.y+hhei;
+        *(temp+offset*i+3) = 1;
+        *(temp+offset*i+4) = 0;
 
         return temp;
     }
@@ -108,38 +134,39 @@ namespace Util
         return temp;
     }
 
-    float* get_quad_bufferind_uv(fVec2 pos, fVec2 dim, Color3 col, uint32_t uvCount = 2)
+    float* get_quad_bufferind_uv(fVec3 pos, fVec3 dim, Color4 col, uint32_t uvCount = 2)
     {
         float *temp = new float[QUAD_IND_VERTEX_COUNT + uvCount*4];
         float hhei = dim.y/2.0;
         float hwid = dim.x/2.0;
         int i = 0;
+        int offset = (6 + uvCount);
 
-        *(temp+(6 + uvCount)*i) =  pos.x-hwid;
-        *(temp+(6 + uvCount)*i+1) =  pos.y-hhei;
-        *(temp+(6 + uvCount)*i+6) =  0;
-        *(temp+(6 + uvCount)*i+7) =  0;
+        *(temp+offset*i) =  pos.x-hwid;
+        *(temp+offset*i+1) =  pos.y-hhei;
+        *(temp+offset*i+6) =  0;
+        *(temp+offset*i+7) =  0;
 
-        *(temp+(6 + uvCount)*(++i)) = pos.x-hwid;
-        *(temp+(6 + uvCount)*i+1) = pos.y+hhei;
-        *(temp+(6 + uvCount)*i+6) =  0;
-        *(temp+(6 + uvCount)*i+7) =  1;
+        *(temp+offset*(++i)) = pos.x-hwid;
+        *(temp+offset*i+1) = pos.y+hhei;
+        *(temp+offset*i+6) =  0;
+        *(temp+offset*i+7) =  1;
 
-        *(temp+(6 + uvCount)*(++i)) = pos.x+hwid;
-        *(temp+(6 + uvCount)*i+1) = pos.y-hhei;
-        *(temp+(6 + uvCount)*i+6) =  1;
-        *(temp+(6 + uvCount)*i+7) =  0;
+        *(temp+offset*(++i)) = pos.x+hwid;
+        *(temp+offset*i+1) = pos.y-hhei;
+        *(temp+offset*i+6) =  1;
+        *(temp+offset*i+7) =  0;
 
-        *(temp+(6 + uvCount)*(++i)) =  pos.x+hwid;
-        *(temp+(6 + uvCount)*i+1) =  pos.y+hhei;
-        *(temp+(6 + uvCount)*i+6) =  1;
-        *(temp+(6 + uvCount)*i+7) =  1;
+        *(temp+offset*(++i)) =  pos.x+hwid;
+        *(temp+offset*i+1) =  pos.y+hhei;
+        *(temp+offset*i+6) =  1;
+        *(temp+offset*i+7) =  1;
 
         for(i=0;i<QUAD_IND_VERTEX_COUNT/PER_VERTEX_MOD;++i)
         {
-            *(temp+(6 + uvCount)*i+3) = col.r;
-            *(temp+(6 + uvCount)*i+4) = col.g;
-            *(temp+(6 + uvCount)*i+5) = col.b;
+            *(temp+offset*i+3) = col.r;
+            *(temp+offset*i+4) = col.g;
+            *(temp+offset*i+5) = col.b;
         }
 
         return temp;

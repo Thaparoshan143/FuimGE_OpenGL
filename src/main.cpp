@@ -1,10 +1,7 @@
 #include<application.cpp>
 #include<log.cpp>
 #include<entity.cpp>
-#include<timer.cpp>
 #include<renderer.cpp>
-#define FAST_OBJ_IMPLEMENTATION
-#include<fast_obj.h>
 #include<imgui.h>
 #define __OBJC__
 #include<imgui_impl_glfw.h>
@@ -32,21 +29,14 @@ class GEApplication : public Component::Application
 	~GEApplication()	
 	{
 		delete m_renderer;
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
 	}
 
 	void Initialize() override	
 	{	
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);   
-		// glEnable(GL_CULL_FACE);
-		// glCullFace(GL_BACK);
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glEnable(GL_BLEND);  
 
-    	glfwSwapInterval(1); // Enable vsync
-		// Initializing the ImGui and its context 
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		m_io = ImGui::GetIO();
@@ -56,51 +46,35 @@ class GEApplication : public Component::Application
    	 	ImGui::StyleColorsDark();
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(this->m_window.GetWindowHandle(), true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-		ImGui_ImplOpenGL3_Init("#version 330");
+		ImGui_ImplOpenGL3_Init("#version 330"); 
 	}
 
 	void Loop() override
 	{
-		bool show_demo_window = true;
-		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-		float *pos = new float[3];
-		float *rot = new float[3];
-		float *scale = new float[3];
-		std::string objectName = "Default";
-		bool show_inspector = true;
-
-		External::FastObjWrapper tempObj("./res/Models/sphere.obj");
-		Component::VertexArrayObject vao(BufferFormat::PPP);
-		Component::VertexBufferObject vbo;
-		Component::IndexBufferObject ibo;
-		Component::Shader shader("./res/Shaders/Basic/", "ver.shader", "frag.shader");
+		Component::Shader shader("./res/Shaders/Texture/", "ver.shader", "frag.shader");
 		shader.CompileProgram();
-		vao.Bind();
-		auto tempVert = tempObj.GetVertexPosition();
-		vbo.AppendBuffer(tempVert);
-		vbo.Offload();
-		auto tempIbo = tempObj.GetIndex();
-		ibo.AppendBuffer(tempIbo);
-		ibo.Offload();
-		vao.EnableVertexAttrib();
 
+		using namespace Component;
+		Mesh mesh("./res/Models/Sphere.obj", BufferFormat::PPP_UV);
+		mesh.Offload();
+
+		Texture texture("./res/Images/temp1.jpg");
+		texture.Offload();
 
 		while(!m_window.ShouldCloseWindow())
 		{
         	glfwPollEvents();
 
-			glfwGetFramebufferSize(m_window.GetWindowHandle(), &m_window.m_winProp.width, &m_window.m_winProp.height);
-        	glViewport(0, 0, m_window.m_winProp.width, m_window.m_winProp.height);
 			m_window.SetBgColor(DEFAULT_WINDOW_BG);
 
-			vao.Bind();
+			m_renderer->Render();
+			texture.Bind();
 			shader.UseProgram();
 			shader.SetUniformMat4("view", m_renderer->GetCamera().GetViewMatrix());
 			shader.SetUniformMat4("projection", m_renderer->GetCamera().GetProjectionMatrix());
 			shader.SetUniformMat4("model", m_renderer->GetCamera().GetModelMatrix());
-			glDrawElements(GL_TRIANGLES, tempObj.GetIndexCount(), GL_UNSIGNED_INT, 0);
-			m_renderer->Render();
-			// (Your code calls glfwSwapBuffers() etc.)
+			mesh.Render();
+
 			m_window.SwapFrameBuffer();
 		}
 	}

@@ -3,6 +3,8 @@
 
 #include<interface.h>
 #include<glad.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include<stb_image.h>
 
 // 256 buffer reserve by default if not mentioned
 #define INIT_BUFFER_RESERVE 256
@@ -126,6 +128,7 @@ namespace Component
         }
         uint32_t GetBufferHandle() const    {  return m_bufferHandle; }
         void SetFormat(BufferFormat bf)     {   m_format = bf;  }
+        BufferFormat GetFormat()            {   return m_format;  }
 
         protected:
         uint32_t m_bufferHandle;
@@ -136,6 +139,46 @@ namespace Component
 		    return (getMask(BUFFER_MASKPPP) + (getMask(BUFFER_MASKRGB)>>3) + (getMask(BUFFER_MASKTEX)>>6) + (getMask(BUFFER_MASKNORMAL)>>9));
         }
         uint32_t getMask(uint32_t maskFormat)  {    return m_format & maskFormat;   }
+    };
+
+    class Texture 
+    {
+        public:
+        Texture(std::string path) : m_path(path)
+        {
+            glGenTextures(1, &m_textureHandle);
+            m_target = GL_TEXTURE_2D;
+        }
+
+        uint32_t Bind()     {   glBindTexture(m_target, m_textureHandle);   return m_textureHandle; }
+        void Unbind()       {   glBindTexture(m_target, 0); }
+        void Offload()  
+        {
+            Bind();
+            External::stbi_set_flip_vertically_on_load(true);
+            int channelCount = 3;
+            u_char *rawImage = External::stbi_load(m_path.c_str(), &m_imgDim.x, &m_imgDim.y, &channelCount, 0);
+            std::cout << "Raw load successfully" << std::endl;
+            glTexParameteri(m_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(m_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            if(rawImage)
+            {
+                glTexImage2D(m_target, 0, GL_RGBA, m_imgDim.x, m_imgDim.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, rawImage);
+            }
+            else
+            {
+                std::cout << "Unable to read and offload the image data" << std::endl;
+            }
+            External::stbi_image_free(rawImage);
+        }
+
+        std::string m_path;
+        uint32_t m_target, m_textureHandle;
+        iVec2 m_imgDim;
     };
 }
 #endif

@@ -73,7 +73,7 @@ namespace Component
 
             float vel = m_camProp.speed * ImGui::GetIO().DeltaTime;
             Math::Movement dir = m_keyNavMap[key.GetKey()];
-            std::cout << "Key got here : " << char(key.GetKey()) << std::endl;
+            // std::cout << "Key got here : " << char(key.GetKey()) << std::endl;
             switch(dir)
             {
                 case Math::Movement::FORWARD:
@@ -98,7 +98,7 @@ namespace Component
                     std::cout << "Unknow direction to process ! Try again" << std::endl;
                 break;
             }
-            std::cout << m_transform.position.x << ", " << m_transform.position.y << ", " << m_transform.position.z << std::endl;
+            // std::cout << m_transform.position.x << ", " << m_transform.position.y << ", " << m_transform.position.z << std::endl;
         }
 
         static void ProcessMouseScroll(float x, float y)
@@ -140,12 +140,12 @@ namespace Component
             front.y = sin(ToRadian(m_camProp.pitch));
             front.z = sin(ToRadian(m_camProp.yaw)) * cos(ToRadian(m_camProp.pitch));
             m_camProp.front = Math::normalize(front);
-            std::cout << "Front vector : " << m_camProp.front.x << ", " << m_camProp.front.y << ", " << m_camProp.front.z << std::endl;
+            // std::cout << "Front vector : " << m_camProp.front.x << ", " << m_camProp.front.y << ", " << m_camProp.front.z << std::endl;
 
             m_camProp.right = Math::normalize(Math::cross_product(m_camProp.front, m_camProp.worldUp));
-            std::cout << "Right vector : " << m_camProp.right.x << ", " << m_camProp.right.y << ", " << m_camProp.right.z << std::endl;
+            // std::cout << "Right vector : " << m_camProp.right.x << ", " << m_camProp.right.y << ", " << m_camProp.right.z << std::endl;
             m_camProp.up = Math::normalize(Math::cross_product(m_camProp.right, m_camProp.front));  
-            std::cout << "Up vector : " << m_camProp.up.x << ", " << m_camProp.up.y << ", " << m_camProp.up.z << std::endl;
+            // std::cout << "Up vector : " << m_camProp.up.x << ", " << m_camProp.up.y << ", " << m_camProp.up.z << std::endl;
         }
 
         friend class Renderer;
@@ -200,6 +200,8 @@ namespace Component
             glDrawArrays(GL_LINES, 0, m_VBO.GetBufferSize());
         }
 
+        uint32_t GetBufferLayout() override {   return m_VAO.GetFormat();   }
+
         VertexArrayObject m_VAO;
         VertexBufferObject m_VBO;
         Shader m_shader;
@@ -223,6 +225,7 @@ namespace Component
                 return;
             }
             m_renderQueue.push_back(entity);
+            m_bufferLayoutMap.insert({entity->GetBufferLayout(), VertexArrayObject((BufferFormat)entity->GetBufferLayout())});
         }
 
         void Render()
@@ -230,6 +233,7 @@ namespace Component
             m_grid.Render();
             for(int i=0;i<m_renderQueue.size();++i)
             {
+                m_bufferLayoutMap[m_renderQueue[i]->GetBufferLayout()].EnableVertexAttrib();
                 m_renderQueue[i]->Render();
             }
         }
@@ -240,6 +244,7 @@ namespace Component
         Camera m_camera;
         GridLine m_grid;
         std::vector<Interface::IRenderableEntity*> m_renderQueue;
+        std::map<uint32_t, VertexArrayObject> m_bufferLayoutMap;
     };
 }
 
