@@ -200,7 +200,7 @@ namespace Component
             glDrawArrays(GL_LINES, 0, m_VBO.GetBufferSize());
         }
 
-        uint32_t GetBufferLayout() override {   return m_VAO.GetFormat();   }
+        uint32_t GetBufferLayout() {   return m_VAO.GetFormat();   }
 
         VertexArrayObject m_VAO;
         VertexBufferObject m_VBO;
@@ -225,7 +225,6 @@ namespace Component
                 return;
             }
             m_renderQueue.push_back(entity);
-            m_bufferLayoutMap.insert({entity->GetBufferLayout(), VertexArrayObject((BufferFormat)entity->GetBufferLayout())});
         }
 
         void Render()
@@ -233,7 +232,6 @@ namespace Component
             m_grid.Render();
             for(int i=0;i<m_renderQueue.size();++i)
             {
-                m_bufferLayoutMap[m_renderQueue[i]->GetBufferLayout()].EnableVertexAttrib();
                 m_renderQueue[i]->Render();
             }
         }
@@ -244,7 +242,6 @@ namespace Component
         Camera m_camera;
         GridLine m_grid;
         std::vector<Interface::IRenderableEntity*> m_renderQueue;
-        std::map<uint32_t, VertexArrayObject> m_bufferLayoutMap;
     };
 }
 

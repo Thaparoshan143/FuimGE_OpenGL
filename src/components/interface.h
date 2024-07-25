@@ -11,7 +11,6 @@ namespace Interface
         public: 
         IRenderableEntity() {   }
         virtual void Render() = 0;
-        virtual uint32_t GetBufferLayout() = 0;
         
         protected:
         std::string name;

@@ -144,10 +144,11 @@ namespace Component
     class Texture 
     {
         public:
-        Texture(std::string path) : m_path(path)
+        Texture(std::string path, std::string type = "") : m_path(path)
         {
             glGenTextures(1, &m_textureHandle);
             m_target = GL_TEXTURE_2D;
+            m_type = type;
         }
 
         uint32_t Bind()     {   glBindTexture(m_target, m_textureHandle);   return m_textureHandle; }
@@ -176,7 +177,10 @@ namespace Component
             External::stbi_image_free(rawImage);
         }
 
-        std::string m_path;
+        bool IsOfType(std::string type)    {   return m_type == type;  }
+        void SetActiveSlot(uint32_t slot)   {   glActiveTexture(slot);  }
+
+        std::string m_path, m_type;
         uint32_t m_target, m_textureHandle;
         iVec2 m_imgDim;
     };

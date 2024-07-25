@@ -35,7 +35,9 @@ class GEApplication : public Component::Application
 	{	
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);  
-
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -55,8 +57,8 @@ class GEApplication : public Component::Application
 		shader.CompileProgram();
 
 		using namespace Component;
-		Mesh mesh("./res/Models/Sphere.obj", BufferFormat::PPP_UV);
-		mesh.Offload();
+		Model tempModel("./res/Models/cube.obj");
+		std::cout << "Model load Successful" << std::endl;
 
 		Texture texture("./res/Images/temp1.jpg");
 		texture.Offload();
@@ -73,7 +75,7 @@ class GEApplication : public Component::Application
 			shader.SetUniformMat4("view", m_renderer->GetCamera().GetViewMatrix());
 			shader.SetUniformMat4("projection", m_renderer->GetCamera().GetProjectionMatrix());
 			shader.SetUniformMat4("model", m_renderer->GetCamera().GetModelMatrix());
-			mesh.Render();
+			tempModel.Render();
 
 			m_window.SwapFrameBuffer();
 		}
