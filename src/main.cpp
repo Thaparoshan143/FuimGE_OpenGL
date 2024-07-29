@@ -19,7 +19,7 @@ class GEApplication : public Component::Application
 		Component::GridProp gridProp({-10, 10}, {10, -10}, {19, 19});
 		m_renderer = new Component::Renderer(camProp, gridProp);
 		m_renderer->GetCamera().m_transform.position = fVec3(5, 2, 5);
-		m_GUIManager = new GUI::GUIManager(*this);
+		m_GUIManager = new GUI::GUIManager;
 	}
 
 	~GEApplication()	
@@ -34,16 +34,18 @@ class GEApplication : public Component::Application
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		m_GUIManager->Init();
+		m_GUIManager->Init(*this);
 	}
 
 	void Loop() override
 	{
-		Component::Shader shader("./res/Shaders/Texture/", "ver.shader", "frag.shader");
-		shader.CompileProgram();
-
 		using namespace Component;
-		Model tempModel("./res/Models/sphere.obj");
+		Model tempModel2("./res/Models/cube.obj", PPP_NNN, "Cube");
+		Model tempModel("./res/Models/sphere.obj", PPP_NNN, "Sphere");
+		tempModel2.SetTransform(fVec3(-5, 0, 1), fVec3(0, 20, 0), fVec3(1.1));
+		tempModel.SetTransform(fVec3(1, 0, -5), fVec3(0, 0, 0), fVec3(2));
+		m_renderer->AddEntity(&tempModel2);
+		m_renderer->AddEntity(&tempModel);
 
 		while(!m_window.ShouldCloseWindow())
 		{
@@ -51,12 +53,8 @@ class GEApplication : public Component::Application
 
 			m_window.SetBgColor(DEFAULT_WINDOW_BG);
 
+			m_renderer->Update();
 			m_renderer->Render();
-			shader.UseProgram();
-			shader.SetUniformMat4("view", m_renderer->GetCamera().GetViewMatrix());
-			shader.SetUniformMat4("projection", m_renderer->GetCamera().GetProjectionMatrix());
-			shader.SetUniformMat4("model", m_renderer->GetCamera().GetModelMatrix());
-			tempModel.Render();
 
 			m_GUIManager->Render();
 			m_window.SwapFrameBuffer();

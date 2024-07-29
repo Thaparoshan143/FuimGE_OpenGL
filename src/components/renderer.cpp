@@ -11,6 +11,13 @@
 #include<imgui.h>
 #include<map>
 
+// directory list map for the shader for corresponding buffer format;
+static std::map<uint32_t, std::string> _shader_dir = {
+    {PPP_UV_NNN, "./res/Shaders/Texture/"},
+    {PPP_NNN, "./res/Shaders/Normal/"},
+    {PPP_RGB, "./res/Shaders/"}
+};
+
 namespace Component
 {
     #define CAM_ZOOM_LOW 1.0
@@ -165,7 +172,7 @@ namespace Component
 
     struct GridProp
     {
-        GridProp(fVec2 s = fVec2(-1, 1), fVec2 e = fVec2(1, -1), fVec2 gc = fVec2(9), Color4 col = Color4(1, 0.5, 0.2, 1))
+        GridProp(fVec2 s = fVec2(-1, 1), fVec2 e = fVec2(1, -1), fVec2 gc = fVec2(9), Color4 col = Color4(0.4, 0.4, 0.4))
         {
             start = s;
             end = e;
@@ -190,7 +197,7 @@ namespace Component
             delete[] temp;
         }
 
-        void Render()
+        void Update()
         {
             m_VAO.Bind();
             m_VBO.Bind();
@@ -199,10 +206,14 @@ namespace Component
             m_shader.SetUniformMat4("projection", Camera::GetProjectionMatrix());
             m_shader.SetUniformMat4("model", Camera::GetModelMatrix());
             m_shader.SetUniformVec4("col", m_gridProp.color);
+        }
+
+        void Render()
+        {
             glDrawArrays(GL_LINES, 0, m_VBO.GetBufferSize());
         }
 
-        uint32_t GetBufferLayout() {   return m_VAO.GetFormat();   }
+        uint32_t GetBufferLayout() override {   return m_VAO.GetFormat();   }
 
         VertexArrayObject m_VAO;
         VertexBufferObject m_VBO;
@@ -217,6 +228,7 @@ namespace Component
         Renderer(CameraProp &camProp, GridProp &gridProp) : m_camera(camProp), m_grid(gridProp)
         {
             m_renderQueue.clear();
+            updateVAOShaderInMap(PPP_RGB);
         }
 
         void AddEntity(Interface::IRenderableEntity *entity)
@@ -227,24 +239,81 @@ namespace Component
                 return;
             }
             m_renderQueue.push_back(entity);
+
+            updateVAOShaderInMap(entity->GetBufferLayout());
+        }
+
+        void Update()
+        {
+            m_grid.Update();
+            for(const auto &item : m_renderQueue)
+            {
+                item->Update();
+            }
         }
 
         void Render()
         {
             m_grid.Render();
-            for(int i=0;i<m_renderQueue.size();++i)
+            for(const auto &item : m_renderQueue)
             {
-                m_renderQueue[i]->Render();
+                Shader *tempShader = m_shaderMap[item->GetBufferLayout()];
+                tempShader->UseProgram();
+                Math::Mat4 model = m_camera.GetModelMatrix();
+                tempShader->SetUniformMat4("view", m_camera.GetViewMatrix());
+                tempShader->SetUniformMat4("projection", m_camera.GetProjectionMatrix());
+
+                model = Math::RotateMatX(item->GetRotation().x) * model;
+                model = Math::RotateMatY(item->GetRotation().y) * model;
+                model = Math::RotateMatZ(item->GetRotation().z) * model;
+                // model = Math::RotateMat(0, item->GetRotation()) * model;
+                model = Math::ScaleMat(model, item->GetScale());
+                model = Math::TranslateMat(model, item->GetPosition());
+                tempShader->SetUniformMat4("model",  model);
+                tempShader->SetUniformVec4("col", item->material.color);
+                item->Render();
             }
         }
 
         Camera& GetCamera()  {   return m_camera;    }
         
         protected:
+        void updateVAOShaderInMap(uint32_t layout)
+        {
+            if(m_shaderMap.count(layout) == 0)
+            {
+                std::cout << "Layout is unknow adding the new map now" << std::endl;
+                Component::VertexArrayObject *tempVAO = new VertexArrayObject((BufferFormat)layout);
+                tempVAO->EnableVertexAttrib();
+                Shader *tempShader = nullptr;
+                try
+                {
+                    tempShader = new Shader(_shader_dir[layout], "ver.shader", "frag.shader");
+                    tempShader->CompileProgram();
+                    std::cout << "Dir added : " << _shader_dir[layout] << std::endl;
+                    m_shaderMap[layout] = tempShader;
+                }
+                catch(...)
+                {
+                    std::cout << "Unable to find the shader from global map" << std::endl;
+                }
+            }
+            else
+            {
+                std::cout << "Layout already predefined : " << _shader_dir[layout] << std::endl;
+            }
+        }
+
+        friend class GUIManager;
+        public:
+        std::vector<Interface::IRenderableEntity*> m_renderQueue;
+        protected:
         Camera m_camera;
         GridLine m_grid;
-        std::vector<Interface::IRenderableEntity*> m_renderQueue;
+        // here the map is intact between the buffer layout along with the VAO and corresponding shader map 
+        static std::map<uint32_t, Shader*> m_shaderMap;
     };
+    std::map<uint32_t, Shader*> Renderer::m_shaderMap;
 }
 
 // static callback functions

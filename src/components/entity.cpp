@@ -13,79 +13,48 @@ namespace Component
 {
     #define COMP_COUNT 3
     
-    class Mesh : Interface::IRenderableEntity
+    class Mesh
     {
         public:
-        Mesh()
+        Mesh()  {   }
+
+        void Render()
         {
-            m_textures = new std::vector<Texture*>;
-        }
-
-        uint32_t GetBufferLayout() {   return m_VAO.GetFormat();   }
-
-        void Render() override
-        {
-            // bind appropriate textures
-            unsigned int diffuseNr  = 1;
-            unsigned int specularNr = 1;
-            unsigned int normalNr   = 1;
-            unsigned int heightNr   = 1;
-
-
-            // for(unsigned int i = 0; i < (*m_textures).size(); i++)
-            // {
-            //     std::cout << "Cannot go inside" << std::endl;
-            //     (*m_textures)[i]->SetActiveSlot(GL_TEXTURE0 + i); // active proper texture unit before binding
-            //     // retrieve texture number (the N in diffuse_textureN)
-            //     std::string number;
-            //     if((*m_textures)[i]->IsOfType("texture_diffuse"))
-            //         number = std::to_string(diffuseNr++);
-            //     else if((*m_textures)[i]->IsOfType("texture_specular"))
-            //         number = std::to_string(specularNr++); // transfer unsigned int to string
-            //     else if((*m_textures)[i]->IsOfType("texture_normal"))
-            //         number = std::to_string(normalNr++); // transfer unsigned int to string
-            //     else if((*m_textures)[i]->IsOfType("texture_height"))
-            //         number = std::to_string(heightNr++); // transfer unsigned int to string
-
-            //     // now set the sampler to the correct texture unit
-            //     m_shader->SetUniformInt(((*m_textures)[i]->m_type + number), i);
-            //     // and finally bind the texture
-            //     (*m_textures)[i]->Bind();
-            // }
-            
-            // draw mesh
-            m_VAO.Bind();
+            m_VBO.Bind();
+            m_IBO.Bind();
             glDrawElements(GL_TRIANGLES, m_IBO.GetBufferSize(), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-
-            // always good practice to set everything back to defaults once configured.
-            glActiveTexture(GL_TEXTURE0);
         }
 
         friend class Model;
         protected:
         VertexBufferObject m_VBO;
         IndexBufferObject m_IBO;
-        VertexArrayObject m_VAO;
-        std::vector<Texture*> *m_textures;
-        Shader *m_shader;
     };
 
-    class Model : Interface::IRenderableEntity
+    class Model : public Interface::IRenderableEntity
     {
         public:
-        Model(std::string path, bool gamma = false)
+        Model(std::string path, uint32_t layout = PPP_UV_NNN, std::string _name = "Default", bool gamma = false) : m_VAO((BufferFormat)layout)
         {
+            name = _name;
             loadModel(path);
+            std::cout << " IBO Count : " << m_meshes[0]->m_IBO.GetBufferSize() << std::endl;
         }
+
+        void Update() override  {   }
 
         void Render() override
         {
+            m_VAO.Bind();
             for(uint i = 0;i<(uint)m_meshes.size();++i)
             {
                 m_meshes[m_meshes.size() - i - 1]->Render();
             }
         }
+
+        // just temporary for now
+        uint32_t GetBufferLayout()  {   return m_VAO.GetFormat();  }
+        void SetMaterial(MaterialProp mat) {    material = mat; }
 
         protected:
         void loadModel(std::string &path)
@@ -140,32 +109,27 @@ namespace Component
                 vertex.push_back(mesh->mVertices[i].z);
 
                 // texture coordinates
-                if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+                if((m_VAO.GetFormat() & BUFFER_MASKTEX) && mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
                 {
                     // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
                     // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
                     vertex.push_back(mesh->mTextureCoords[0][i].x); 
                     vertex.push_back(mesh->mTextureCoords[0][i].y);
                 }
-                else
+                else if((m_VAO.GetFormat() & BUFFER_MASKTEX))
                 {
                     vertex.push_back(0);
                     vertex.push_back(0);
                 }
 
                 // normals
-                if (mesh->HasNormals())
+                if ((m_VAO.GetFormat() & BUFFER_MASKNORMAL) && mesh->HasNormals())
                 {
                     vertex.push_back(mesh->mNormals[i].x);
                     vertex.push_back(mesh->mNormals[i].y);
                     vertex.push_back(mesh->mNormals[i].z);
                 }
                 temp->m_VBO.AppendBuffer(vertex);
-            }
-            temp->m_VAO.SetFormat(BufferFormat::PPP_UV);
-            if(mesh->HasNormals())
-            {
-                temp->m_VAO.SetFormat(BufferFormat::PPP_UV_NNN);
             }
 
             // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
@@ -179,87 +143,21 @@ namespace Component
                 temp->m_IBO.AppendBuffer(faceIndex);
             }
 
-            temp->m_VAO.Bind();
+            m_VAO.Bind();
             temp->m_VBO.Offload();
             temp->m_IBO.Offload();
+            m_VAO.EnableVertexAttrib();
+            // std::cout << "name : " << name << std::endl;
+            // std::cout << "##Buffer handle : VBO : " << temp->m_VBO.GetBufferHandle() << std::endl;
+            // std::cout << "##Buffer handle : IBO : " << temp->m_IBO.GetBufferHandle() << std::endl;
 
-            // process materials
-            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex]; 
-            // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-            // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-            // Same applies to other texture as the following list summarizes:
-            // diffuse: texture_diffuseN
-            // specular: texture_specularN
-            // normal: texture_normalN
-
-            std::vector<Texture*> *maps = nullptr;
-            // 1. diffuse maps
-            maps = queryTextureIfNotLoad(material, aiTextureType_DIFFUSE, "texture_diffuse");
-            if(maps)
-                temp->m_textures->insert(temp->m_textures->end(), maps->begin(), maps->end());
-
-            // 2. specular maps
-            maps = queryTextureIfNotLoad(material, aiTextureType_SPECULAR, "texture_specular");
-            if(maps)
-                temp->m_textures->insert(temp->m_textures->end(), maps->begin(), maps->end());
-
-            // 3. normal maps
-            maps = queryTextureIfNotLoad(material, aiTextureType_NORMALS, "texture_normal");
-            if(maps)
-                temp->m_textures->insert(temp->m_textures->end(), maps->begin(), maps->end());
-
-            // 4. height maps
-            maps = queryTextureIfNotLoad(material, aiTextureType_HEIGHT, "texture_height");
-            if(maps)
-                temp->m_textures->insert(temp->m_textures->end(), maps->begin(), maps->end());
-            
             // return a mesh object created from the extracted mesh data
-            temp->m_VAO.EnableVertexAttrib();
-            temp->m_VAO.Unbind();
             return temp;
         }
 
-        bool loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
-        {
-            try
-            {
-                for(uint i = 0; i < mat->GetTextureCount(type); i++)
-                {
-                    aiString str;
-                    mat->GetTexture(type, i, &str);
-                    std::cout << "String recieved from GetTexture() : " << str.data << std::endl;
-                    Texture *temp = new Texture(str.data);
-                    temp->m_type = typeName;
-                    temp->Bind();
-                    temp->Offload();
-                    
-                    // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
-                    m_texturesLoaded[typeName].push_back(temp);
-                }
-                return true;
-            }
-            catch(...)
-            {
-                std::cout << "Couldn't find texture" << std::endl;
-                return false;
-            }
-        }
-
-        std::vector<Texture*>* queryTextureIfNotLoad(aiMaterial *mat, aiTextureType type, std::string typeName)
-        {
-            if(m_texturesLoaded.count(typeName) == 0)
-            {
-                std::cout << "Not found! loading texture for model" << std::endl;
-                if(!loadMaterialTextures(mat, type, typeName))
-                    return nullptr;
-            }
-            // std::cout << "Trying to return" << std::endl;
-            return (m_texturesLoaded.count(typeName) != 0)?&m_texturesLoaded[typeName]:nullptr;
-        }
-        
         protected:
+        VertexArrayObject m_VAO;
         std::vector<Mesh*> m_meshes;
-        std::map<std::string, std::vector<Texture*>> m_texturesLoaded;
         std::string m_dir;
         bool m_gammaCorrection;
     };
