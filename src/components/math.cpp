@@ -91,6 +91,7 @@ namespace Math
 
 
     // The matrix here is the implementation of other library with wrapper so have to inspect if something breaks (source : check ./src/external/math/math_3d.h)
+    // This is column major so opeartion are to be changed accordongly
     struct Mat4
     {
         public:
@@ -110,8 +111,6 @@ namespace Math
             row[0][3] = m03, row[1][3] = m13, row[2][3] = m23, row[3][3] = m33;
         }
 
-
-
         Mat4 operator=(Mat4 &rhs)
         {
             for(int i=0;i<16;++i)
@@ -120,6 +119,16 @@ namespace Math
             }
             return *this;
         }
+
+        Mat4 operator=(Mat4 rhs)
+        {
+            for(int i=0;i<16;++i)
+            {
+                *(data + i) = *(rhs.data + i);
+            }
+            return *this;
+        }
+
         friend Mat4 operator*(float v, Mat4 &rhs);
         Mat4 operator*(Mat4 &rhs)
         {
@@ -194,51 +203,49 @@ namespace Math
 
     static Mat4 ScaleMat(Mat4 &mat, fVec3 scale)
     {
-        Mat4 result;
-        result.row[0][0] = scale.x;
-        result.row[1][1] = scale.y;
-        result.row[2][2] = scale.z;
-        return result;
+        mat.row[0][0] *= scale.x;
+        mat.row[1][1] *= scale.x;
+        mat.row[2][2] *= scale.x;
+        return mat;
     }
 
     static Mat4 TranslateMat(Mat4 &mat, fVec3 trans)
     {
-        Mat4 result;
-        result.row[0][3] = trans.x;
-        result.row[1][3] = trans.y;
-        result.row[2][3] = trans.z;
-        return result;
+        mat.row[3][0] = trans.x;
+        mat.row[3][1] = trans.y;
+        mat.row[3][2] = trans.z;
+        return mat;
     }
 
     static Mat4 RotateMatX(float angle)
     {
-        float s = sinf(angle), c = cosf(angle);
+        float s = sinf(ToRadian(angle)), c = cosf(ToRadian(angle));
         return Mat4(
             1,  0,  0,  0,
-            0,  c, -s,  0,
-            0,  s,  c,  0,
+            0,  c, s,  0,
+            0,  -s,  c,  0,
             0,  0,  0,  1
         );
     }
 
     static Mat4 RotateMatY(float angle)
     {
-        float s = sinf(angle), c = cosf(angle);
+        float s = sinf(ToRadian(angle)), c = cosf(ToRadian(angle));
         return Mat4(
-            c,  0,  s,  0,
+            c,  0,  -s,  0,
             0,  1,  0,  0,
-            -s,  0,  c,  0,
+            s,  0,  c,  0,
             0,  0,  0,  1
         );
     }
 
     static Mat4 RotateMatZ(float angle)
     {
-        float s = sinf(angle), c = cosf(angle);
+        float s = sinf(ToRadian(angle)), c = cosf(ToRadian(angle));
         return Mat4(
-            c,  0,  s,  0,
+            c,  0,  -s,  0,
             0,  1,  0,  0,
-            -s,  0,  c,  0,
+            s,  0,  c,  0,
             0,  0,  0,  1
         );
     }
@@ -247,12 +254,12 @@ namespace Math
     {
         fVec3 normalized_axis = Math::normalize(axis);
         float x = normalized_axis.x, y = normalized_axis.y, z = normalized_axis.z;
-        float c = cosf(angle), s = sinf(angle);
+        float c = cosf(ToRadian(angle)), s = sinf(ToRadian(angle));
         
         return Mat4(
-                c + x*x*(1-c),          x*y*(1-c) - z*s,        x*z*(1-c) + y*s,    0,
-                y*x*(1-c) + z*s,        c + y*y*(1-c),          y*z*(1-c) - x*s,    0,
-                z*x*(1-c) - y*s,        z*y*(1-c) + x*s,        c + z*z*(1-c),      0,
+                c + x*x*(1-c),          x*y*(1-c) + z*s,        x*z*(1-c) - y*s,    0,
+                y*x*(1-c) - z*s,        c + y*y*(1-c),          y*z*(1-c) + x*s,    0,
+                z*x*(1-c) + y*s,        z*y*(1-c) - x*s,        c + z*z*(1-c),      0,
                 0,                      0,                      0,                  1
             );
     }
