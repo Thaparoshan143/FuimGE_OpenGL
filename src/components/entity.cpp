@@ -31,6 +31,27 @@ namespace Component
         IndexBufferObject m_IBO;
     };
 
+    class DuplicateModel : public Interface::IRenderableEntity
+    {
+        public:
+        DuplicateModel(IRenderableEntity *parent, Math::Transform newTransform)
+        {
+            m_origin = parent;
+            transform = newTransform;
+            name = parent->GetName() + "_" + std::to_string(dupCount);
+            dupCount++;
+        }
+
+        void Update() override              {   m_origin->Update(); }
+        void Render() override              {   m_origin->Render(); }
+        uint32_t GetBufferLayout() override {   return m_origin->GetBufferLayout();    }
+
+        Interface::IRenderableEntity *m_origin;
+        static int dupCount;
+    };
+
+    int DuplicateModel::dupCount = 0;
+
     class Model : public Interface::IRenderableEntity
     {
         public:
@@ -160,23 +181,6 @@ namespace Component
         std::vector<Mesh*> m_meshes;
         std::string m_dir;
         bool m_gammaCorrection;
-    };
-
-    class DuplicateModel : public Interface::IRenderableEntity
-    {
-        public:
-        DuplicateModel(IRenderableEntity *parent, Math::Transform newTransform)
-        {
-            m_origin = parent;
-            transform = newTransform;
-            name = parent->GetName() + "_copy";
-        }
-
-        void Update() override              {   m_origin->Update(); }
-        void Render() override              {   m_origin->Render(); }
-        uint32_t GetBufferLayout() override {   return m_origin->GetBufferLayout();    }
-
-        Interface::IRenderableEntity *m_origin;
     };
 
     // This are just for quick testing, don't use otherwise
