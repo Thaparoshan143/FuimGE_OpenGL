@@ -19,7 +19,7 @@ namespace Component
     struct DirectionalLightProp
     {
         fVec3 ambient, diffuse, specular;
-        fVec3 direction;
+        fVec3 direction, color;
     };
 }
 
@@ -33,6 +33,7 @@ namespace Interface
         virtual void Render() = 0;
         virtual uint32_t GetBufferLayout() = 0;
         inline std::string& GetName()  {   return name;  }
+        Math::Transform& GetTransform() {   return transform;   }
         fVec3& GetPosition()    {   return transform.position;  }
         fVec3& GetRotation()    {   return transform.rotation;  }
         fVec3& GetScale()    {   return transform.scale;  }
