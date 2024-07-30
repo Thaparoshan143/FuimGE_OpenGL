@@ -8,12 +8,18 @@ namespace Component
     struct MaterialProp
     {
         public: 
-        MaterialProp(Color4 col = Color4(0.5, 0.5, 0.5), float spe = 0.4, float diff = 0.2, float amb = 0.1, float rough = 0.5)
+        MaterialProp(Color4 col = Color4(0.5, 0.5, 0.5), float spe = 0.8, float diff = 0.4, float amb = 0.05, float rough = 0.5)
         {
             color = col;    specular = spe; diffuse = diff; ambient = amb;  roughness = rough;  
         }
         Color4 color;
         float specular, diffuse, ambient, roughness;
+    };
+
+    struct DirectionalLightProp
+    {
+        fVec3 ambient, diffuse, specular;
+        fVec3 direction;
     };
 }
 
