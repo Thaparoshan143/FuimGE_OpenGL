@@ -22,7 +22,7 @@ namespace Input
 
         protected:
         int m_key;
-        bool m_status;
+        int m_status;
     };
 }
 #endif

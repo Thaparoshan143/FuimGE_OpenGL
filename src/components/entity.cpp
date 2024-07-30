@@ -53,7 +53,7 @@ namespace Component
         }
 
         // just temporary for now
-        uint32_t GetBufferLayout()  {   return m_VAO.GetFormat();  }
+        uint32_t GetBufferLayout() override  {   return m_VAO.GetFormat();  }
         void SetMaterial(MaterialProp mat) {    material = mat; }
 
         protected:
@@ -198,7 +198,7 @@ namespace Component
             m_VAO.EnableVertexAttrib();
         }
 
-        uint32_t GetBufferLayout() {   return m_VAO.GetFormat();   }
+        uint32_t GetBufferLayout() override {   return m_VAO.GetFormat();   }
 
         void Render() override
         {

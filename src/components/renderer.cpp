@@ -197,7 +197,7 @@ namespace Component
             delete[] temp;
         }
 
-        void Update()
+        void Update() override
         {
             m_VAO.Bind();
             m_VBO.Bind();
@@ -208,7 +208,7 @@ namespace Component
             m_shader.SetUniformVec4("col", m_gridProp.color);
         }
 
-        void Render()
+        void Render() override
         {
             glDrawArrays(GL_LINES, 0, m_VBO.GetBufferSize());
         }

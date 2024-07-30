@@ -19,7 +19,7 @@ namespace GUI
     // static helper functions
     static void static_render_vec3inputField(std::string &label, fVec3 &vec3, float min = -THRESHOLD_FLOAT, float max = THRESHOLD_FLOAT)
     {
-        ImGui::Text(label.data());
+        ImGui::TextUnformatted(label.c_str());
         ImGui::SameLine();
 
         ImVec2 buttonSize = { 25, 25 };
@@ -89,7 +89,7 @@ namespace GUI
             {
                 ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetMainViewport()->Size.y));
                 ImGui::Begin("Outliner", NULL, DEFAULT_UI_FLAGS | ImGuiWindowFlags_NoBringToFrontOnFocus);
-                ImGui::Text("Outliner");
+                ImGui::TextUnformatted("Outliner");
                 ImGui::Spacing();ImGui::Spacing();
                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
                 ImGui::SeparatorText("Active Objects");
@@ -97,7 +97,7 @@ namespace GUI
 
                 for(const auto &renderItem : m_activeRenderer->m_renderQueue)
                 {
-                    if(ImGui::Button(renderItem->GetName().data(), ImVec2(ImGui::GetWindowSize().x, 25)))
+                    if(ImGui::Button(renderItem->GetName().c_str(), ImVec2(ImGui::GetWindowSize().x, 25)))
                     {
                         std::cout << "Clicked button : " << renderItem->GetName() << std::endl;
                         m_activeObject = renderItem;
@@ -109,18 +109,18 @@ namespace GUI
                 ImGui::End();
             }
 
-			if(m_showInspector & m_activeObject != nullptr)
+			if(m_showInspector & (m_activeObject != nullptr))
             {
                 ImGui::SetNextWindowSize(ImVec2(350, ImGui::GetMainViewport()->Size.y));
                 ImGui::Begin("Inspector", NULL, DEFAULT_UI_FLAGS | ImGuiWindowFlags_NoBringToFrontOnFocus);
-                ImGui::Text("Inspector");
+                ImGui::TextUnformatted("Inspector");
                 ImGui::Spacing();ImGui::Spacing();
                 ImGui::Separator();ImGui::Separator();
                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
-                ImGui::Text("Name : ");
+                ImGui::TextUnformatted("Name : ");
                 ImGui::PopStyleColor();
                 ImGui::SameLine();
-                ImGui::Text(m_activeObject->GetName().data());
+                ImGui::TextUnformatted(m_activeObject->GetName().c_str());
                 ImGui::Spacing();ImGui::Spacing();
                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
                 ImGui::SeparatorText("Transform");
@@ -141,7 +141,6 @@ namespace GUI
                 {
                     m_cam->m_isNavActive = true;
                 }
-                float temp;
                 ImGui::Spacing();ImGui::Spacing();
                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
                 ImGui::SeparatorText("Object Materials");
