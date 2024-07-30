@@ -204,8 +204,8 @@ namespace Math
     static Mat4 ScaleMat(Mat4 &mat, fVec3 scale)
     {
         mat.row[0][0] *= scale.x;
-        mat.row[1][1] *= scale.x;
-        mat.row[2][2] *= scale.x;
+        mat.row[1][1] *= scale.y;
+        mat.row[2][2] *= scale.z;
         return mat;
     }
 
