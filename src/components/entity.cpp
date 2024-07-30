@@ -162,6 +162,23 @@ namespace Component
         bool m_gammaCorrection;
     };
 
+    class DuplicateModel : public Interface::IRenderableEntity
+    {
+        public:
+        DuplicateModel(IRenderableEntity *parent, Math::Transform newTransform)
+        {
+            m_origin = parent;
+            transform = newTransform;
+            name = parent->GetName() + "_copy";
+        }
+
+        void Update() override              {   m_origin->Update(); }
+        void Render() override              {   m_origin->Render(); }
+        uint32_t GetBufferLayout() override {   return m_origin->GetBufferLayout();    }
+
+        Interface::IRenderableEntity *m_origin;
+    };
+
     // This are just for quick testing, don't use otherwise
     class Triangle : Interface::IRenderableEntity
     {
