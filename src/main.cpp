@@ -33,6 +33,8 @@ class GEApplication : public Component::Application
 		glEnable(GL_BLEND);  
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+		glEnable(GL_DEPTH_TEST);
+		glEnable( GL_POLYGON_SMOOTH );
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		m_GUIManager->Init(*this);
 	}
@@ -46,6 +48,9 @@ class GEApplication : public Component::Application
 		tempModel.SetTransform(fVec3(1, 0, -5), fVec3(0, 0, 0), fVec3(2));
 		m_renderer->AddEntity(&tempModel2);
 		m_renderer->AddEntity(&tempModel);
+		Math::Transform newTrans(fVec3(-5, 0, -5), fVec3(0), fVec3(0.5));
+		DuplicateModel dupCube(&tempModel2, newTrans);
+		m_renderer->AddEntity(&dupCube);
 
 		while(!m_window.ShouldCloseWindow())
 		{

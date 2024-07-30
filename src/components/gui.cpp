@@ -45,28 +45,6 @@ namespace GUI
         ImGui::Separator();
     }
 
-    // These are just the wrapper for the imgui
-    class Vec3InputField : public Interface::IRenderableGUI
-    {
-        public:
-        Vec3InputField(std::string lab, fVec3 v3 = fVec3(), float mn = -THRESHOLD_FLOAT, float mx = THRESHOLD_FLOAT)
-        {
-            label = lab;
-            vec3 = v3;
-            min = mn;
-            max = mx;
-        }
-
-        void Render() override
-        {
-            static_render_vec3inputField(label, vec3, min, max);
-        }
-
-        std::string label;
-        fVec3 vec3;
-        float min, max;
-    };
-
     class GUIManager
     {
         public:
@@ -74,6 +52,7 @@ namespace GUI
         {
             m_showInspector = false;
             m_showOutliner = false;
+            m_activeObject = nullptr;
         }
 
         ~GUIManager()
@@ -112,11 +91,17 @@ namespace GUI
                 ImGui::Begin("Outliner", NULL, DEFAULT_UI_FLAGS | ImGuiWindowFlags_NoBringToFrontOnFocus);
                 ImGui::Text("Outliner");
                 ImGui::Spacing();ImGui::Spacing();
+                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
                 ImGui::SeparatorText("Active Objects");
+                ImGui::PopStyleColor();
 
                 for(const auto &renderItem : m_activeRenderer->m_renderQueue)
                 {
-                    ImGui::Button(renderItem->GetName().data(), ImVec2(ImGui::GetWindowSize().x, 25));
+                    if(ImGui::Button(renderItem->GetName().data(), ImVec2(ImGui::GetWindowSize().x, 25)))
+                    {
+                        std::cout << "Clicked button : " << renderItem->GetName() << std::endl;
+                        m_activeObject = renderItem;
+                    }
                     ImGui::Separator();
                 }
 
@@ -124,18 +109,29 @@ namespace GUI
                 ImGui::End();
             }
 
-			if(m_showInspector)
+			if(m_showInspector & m_activeObject != nullptr)
             {
                 ImGui::SetNextWindowSize(ImVec2(350, ImGui::GetMainViewport()->Size.y));
                 ImGui::Begin("Inspector", NULL, DEFAULT_UI_FLAGS | ImGuiWindowFlags_NoBringToFrontOnFocus);
                 ImGui::Text("Inspector");
                 ImGui::Spacing();ImGui::Spacing();
+                ImGui::Separator();ImGui::Separator();
+                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
+                ImGui::Text("Name : ");
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
+                ImGui::Text(m_activeObject->GetName().data());
+                ImGui::Spacing();ImGui::Spacing();
+                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
                 ImGui::SeparatorText("Transform");
+                ImGui::PopStyleColor();
                 ImGui::SetWindowPos(ImVec2(ImGui::GetMainViewport()->Size.x - ImGui::GetWindowSize().x, 0));
-                for(const auto &entity : m_GUIEntity)
-                {
-                    entity->Render();
-                }
+
+                static std::string _transform[3] = {"Position : ", "Rotation : ", "Scale Fc : "};
+                static_render_vec3inputField(_transform[0], m_activeObject->GetPosition());
+                static_render_vec3inputField(_transform[1], m_activeObject->GetRotation(), -360, 360);
+                static_render_vec3inputField(_transform[2], m_activeObject->GetScale(), 0, 50);
+
                 if(ImGui::IsWindowFocused())
                 {
                     m_cam->m_isNavActive = false;
@@ -145,11 +141,23 @@ namespace GUI
                 {
                     m_cam->m_isNavActive = true;
                 }
+                float temp;
                 ImGui::Spacing();ImGui::Spacing();
-                ImGui::SeparatorText("Object prop");
-                ImGui::ColorPicker3("Color", col);
+                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
+                ImGui::SeparatorText("Object Materials");
+                ImGui::PopStyleColor();
+                ImGui::ColorEdit4("Color", &m_activeObject->material.color.x);
+                ImGui::Spacing();ImGui::Spacing();
+                ImGui::Separator();
+                ImGui::SliderFloat(" : Specular", &m_activeObject->material.specular, 0, 1);
+                ImGui::Separator();
+                ImGui::SliderFloat(" : Diffuse", &m_activeObject->material.diffuse, 0, 1);
+                ImGui::Separator();
+                ImGui::SliderFloat(" : Ambient", &m_activeObject->material.ambient, 0, 1);
+                ImGui::Separator();
+                ImGui::SliderFloat(" : Roughness", &m_activeObject->material.roughness, 0, 1);
+                ImGui::Separator();
                 ImGui::End();
-
             }
 
             ImGui::Begin("Inspector Toggle", NULL, DEFAULT_UI_FLAGS);
@@ -169,21 +177,16 @@ namespace GUI
         protected:
         void initializeGUIEntity()
         {
-            Vec3InputField *GUIentry = new Vec3InputField("Position : ", fVec3(0));
-            m_GUIEntity.push_back(GUIentry);
-            GUIentry = new Vec3InputField("Rotation : ", fVec3(0), -360, 360);
-            m_GUIEntity.push_back(GUIentry);
-            GUIentry = new Vec3InputField("Scale Fc : ", fVec3(1), -100, 100);
-            m_GUIEntity.push_back(GUIentry);
+
         }
 
         protected:
-        float col[3];
         ImGuiIO m_io;
         Component::Camera *m_cam;
         bool m_showInspector, m_showOutliner;
         std::vector<Interface::IRenderableGUI*> m_GUIEntity;
         Component::Renderer *m_activeRenderer;
+        Interface::IRenderableEntity *m_activeObject;
     };
 }
 #endif

@@ -229,6 +229,10 @@ namespace Component
         {
             m_renderQueue.clear();
             updateVAOShaderInMap(PPP_RGB);
+            m_dirLight.direction = fVec3(-0.5);
+            m_dirLight.ambient = fVec3(1);
+            m_dirLight.diffuse = fVec3(1);
+            m_dirLight.specular = fVec3(1);
         }
 
         void AddEntity(Interface::IRenderableEntity *entity)
@@ -270,7 +274,21 @@ namespace Component
                 model = Math::ScaleMat(model, item->GetScale());
                 model = Math::TranslateMat(model, item->GetPosition());
                 tempShader->SetUniformMat4("model",  model);
-                tempShader->SetUniformVec4("col", item->material.color);
+
+                // light properties
+                tempShader->SetUniformVec3("viewPos", m_camera.m_transform.position);
+                tempShader->SetUniformVec3("light.direction", m_dirLight.direction);
+                tempShader->SetUniformVec3("light.ambient", m_dirLight.ambient);
+                tempShader->SetUniformVec3("light.diffuse", m_dirLight.diffuse);
+                tempShader->SetUniformVec3("light.specular", m_dirLight.specular);
+
+                // material properties
+                tempShader->SetUniformFloat("material.ambient", item->material.ambient);
+                tempShader->SetUniformFloat("material.diffuse", item->material.diffuse);
+                tempShader->SetUniformFloat("material.specular", item->material.specular);
+                tempShader->SetUniformFloat("material.roughness", item->material.roughness);
+                tempShader->SetUniformVec4("material.color", item->material.color);
+
                 item->Render();
             }
         }
@@ -304,12 +322,13 @@ namespace Component
             }
         }
 
-        friend class GUIManager;
         public:
         std::vector<Interface::IRenderableEntity*> m_renderQueue;
         protected:
         Camera m_camera;
         GridLine m_grid;
+        // temporarly directional light for now
+        DirectionalLightProp m_dirLight;
         // here the map is intact between the buffer layout along with the VAO and corresponding shader map 
         static std::map<uint32_t, Shader*> m_shaderMap;
     };
