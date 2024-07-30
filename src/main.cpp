@@ -48,12 +48,8 @@ class GEApplication : public Component::Application
 		tempModel.SetTransform(fVec3(1, 0, -5), fVec3(0, 0, 0), fVec3(2));
 		m_renderer->AddEntity(&tempModel2);
 		m_renderer->AddEntity(&tempModel);
-		Math::Transform newTrans(fVec3(-5, 0, -5), fVec3(0), fVec3(0.5));
-		DuplicateModel dupCube(&tempModel2, newTrans);
-		// m_renderer->AddEntity(&dupCube);
-		m_renderer->AddDuplicateEntity(&tempModel2);
-		m_renderer->AddDuplicateEntity(&dupCube);
-		m_renderer->AddDuplicateEntity(&tempModel2);
+		m_renderer->AddDuplicateEntity(&tempModel, 2, true);
+		m_renderer->AddDuplicateEntity(&tempModel2, 2, true);
 
 		while(!m_window.ShouldCloseWindow())
 		{

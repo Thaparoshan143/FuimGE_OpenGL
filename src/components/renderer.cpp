@@ -249,11 +249,17 @@ namespace Component
             updateVAOShaderInMap(entity->GetBufferLayout());
         }
 
-        void AddDuplicateEntity(Interface::IRenderableEntity *origin)
+        void AddDuplicateEntity(Interface::IRenderableEntity *origin, uint32_t count = 1, bool incTransform = false)
         {
-            std::cout << "Duplicate entry register : " << origin->GetName() << std::endl;
-            Interface::IRenderableEntity *temp = new DuplicateModel(origin, origin->GetTransform());
-            AddEntity(temp);
+            std::cout << "==> Duplicate entry register : " << origin->GetName() << std::endl;
+            for(uint32_t i=0;i<count;++i)
+            {
+                Math::Transform newTras = origin->GetTransform();
+                if(incTransform)
+                    newTras.position += (newTras.position * (i+1));
+                Interface::IRenderableEntity *temp = new DuplicateModel(origin, newTras);
+                AddEntity(temp);
+            }
         }
 
         void Update()

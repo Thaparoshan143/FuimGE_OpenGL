@@ -10,6 +10,8 @@
 #include<imgui_impl_opengl3.h>
 #include<application.cpp>
 
+#define THEME_COLOR IM_COL32(160,34,240,255)
+
 namespace GUI
 {
     #define THRESHOLD_FLOAT 10000000.0f
@@ -119,18 +121,6 @@ namespace GUI
                 ImGui::Begin("Outliner", NULL, DEFAULT_UI_FLAGS | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar);
                 ImGui::TextUnformatted("Outliner");
                 ImGui::Spacing();ImGui::Spacing();
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
-                ImGui::SeparatorText("Active Objects");
-                ImGui::PopStyleColor();
-
-                for(const auto &renderItem : m_activeRenderer->m_renderQueue)
-                {
-                    if(ImGui::Button(renderItem->GetName().c_str(), ImVec2(ImGui::GetWindowSize().x - 25, 25)))
-                    {
-                        std::cout << "Clicked button : " << renderItem->GetName() << std::endl;
-                        m_activeObject = renderItem;
-                    }
-                }
 
                 if(ImGui::IsWindowFocused())
                 {
@@ -144,7 +134,7 @@ namespace GUI
 
                 ImGui::Separator();
                 ImGui::Spacing();ImGui::Spacing();
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
+                ImGui::PushStyleColor(ImGuiCol_Text, THEME_COLOR);
                 ImGui::SeparatorText("World");
                 ImGui::PopStyleColor();
                 static std::string appbg("Background");
@@ -160,10 +150,12 @@ namespace GUI
                 ImGui::Separator();
 
                 ImGui::Spacing();ImGui::Spacing();
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
+                ImGui::PushStyleColor(ImGuiCol_Text, THEME_COLOR);
                 ImGui::SeparatorText("Camera Properties");
                 ImGui::PopStyleColor();
 
+                static std::string _camtransform[1] = {"Position"};
+                static_render_vec3inputFieldSep(_camtransform[0], m_cam->m_transform.position, -10, 10);
                 ImGui::SliderFloat(": Sens.", &m_cam->m_camProp.sensitivity, 0.05, 0.8);
                 ImGui::Separator();
                 ImGui::SliderFloat(": Speed", &m_cam->m_camProp.speed, 75, 150);
@@ -172,6 +164,7 @@ namespace GUI
                 ImGui::Spacing();ImGui::Spacing();
                 if(ImGui::Button("Reset", ImVec2(ImGui::GetWindowSize().x - 25, 25)))
                 {
+                    m_cam->m_transform.position = fVec3(5, 2, 5);
                     m_cam->m_camProp.sensitivity = Math::Sensitivity::HIGH * CAM_SENMULTIPLIER;
                     m_cam->m_camProp.speed = Math::Speed::FAST * CAM_SPEEDMULTIPLIER;
                     m_cam->m_camProp.zoom = 45;
@@ -179,7 +172,7 @@ namespace GUI
                 ImGui::Separator();
 
                 ImGui::Spacing();ImGui::Spacing();
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
+                ImGui::PushStyleColor(ImGuiCol_Text, THEME_COLOR);
                 ImGui::SeparatorText("Light Properties");
                 ImGui::PopStyleColor();
                 static std::string lightProp[1] = {"Direction : "};
@@ -196,28 +189,11 @@ namespace GUI
                 ImGui::End();
             }
 
-			if(m_showInspector & (m_activeObject != nullptr))
+			if(m_showInspector)
             {
                 ImGui::SetNextWindowSize(ImVec2(350, ImGui::GetMainViewport()->Size.y));
                 ImGui::Begin("Inspector", NULL, DEFAULT_UI_FLAGS | ImGuiWindowFlags_NoBringToFrontOnFocus);
-                ImGui::TextUnformatted("Inspector");
-                ImGui::Spacing();ImGui::Spacing();
-                ImGui::Separator();ImGui::Separator();
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
-                ImGui::TextUnformatted("Name : ");
-                ImGui::PopStyleColor();
-                ImGui::SameLine();
-                ImGui::TextUnformatted(m_activeObject->GetName().c_str());
-                ImGui::Spacing();ImGui::Spacing();
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
-                ImGui::SeparatorText("Transform");
-                ImGui::PopStyleColor();
                 ImGui::SetWindowPos(ImVec2(ImGui::GetMainViewport()->Size.x - ImGui::GetWindowSize().x, 0));
-
-                static std::string _transform[3] = {"Position : ", "Rotation : ", "Scale Fc : "};
-                static_render_vec3inputField(_transform[0], m_activeObject->GetPosition());
-                static_render_vec3inputField(_transform[1], m_activeObject->GetRotation(), -360, 360);
-                static_render_vec3inputField(_transform[2], m_activeObject->GetScale(), 0, 50);
 
                 if(ImGui::IsWindowFocused())
                 {
@@ -228,21 +204,80 @@ namespace GUI
                 {
                     m_cam->m_isNavActive = true;
                 }
-                ImGui::Spacing();ImGui::Spacing();
-                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
-                ImGui::SeparatorText("Object Materials");
+                ImGui::PushStyleColor(ImGuiCol_Text, THEME_COLOR);
+                ImGui::SeparatorText("Objects List");
                 ImGui::PopStyleColor();
-                ImGui::ColorEdit4("Color", &m_activeObject->material.color.x);
-                ImGui::Spacing();ImGui::Spacing();
-                ImGui::Separator();
-                ImGui::SliderFloat(" : Specular", &m_activeObject->material.specular, 0, 1);
-                ImGui::Separator();
-                ImGui::SliderFloat(" : Diffuse", &m_activeObject->material.diffuse, 0, 1);
-                ImGui::Separator();
-                ImGui::SliderFloat(" : Ambient", &m_activeObject->material.ambient, 0, 1);
-                ImGui::Separator();
-                ImGui::SliderFloat(" : Roughness", &m_activeObject->material.roughness, 0, 1);
-                ImGui::Separator();
+
+                for(const auto &renderItem : m_activeRenderer->m_renderQueue)
+                {
+                    if(ImGui::Button(renderItem->GetName().c_str(), ImVec2(ImGui::GetWindowSize().x - 35, 25)))
+                    {
+                        std::cout << "Clicked button : " << renderItem->GetName() << std::endl;
+                        m_activeObject = renderItem;
+                    }
+                }
+
+                if((m_activeObject != nullptr))
+                {
+                    ImGui::Separator();ImGui::Separator();
+                    ImGui::Spacing();ImGui::Spacing();
+                    ImGui::TextUnformatted("Inspector");
+                    ImGui::Spacing();ImGui::Spacing();
+                    ImGui::PushStyleColor(ImGuiCol_Text, THEME_COLOR);
+                    ImGui::TextUnformatted("Name : ");
+                    ImGui::PopStyleColor();
+                    ImGui::SameLine();
+                    ImGui::TextUnformatted(m_activeObject->GetName().c_str());
+                    ImGui::Spacing();ImGui::Spacing();
+                    ImGui::PushStyleColor(ImGuiCol_Text, THEME_COLOR);
+                    ImGui::SeparatorText("Transform");
+                    ImGui::PopStyleColor();
+
+                    static std::string _transform[3] = {"Position : ", "Rotation : ", "Scale Fc : "};
+                    static_render_vec3inputField(_transform[0], m_activeObject->GetPosition());
+                    static_render_vec3inputField(_transform[1], m_activeObject->GetRotation(), -360, 360);
+                    static_render_vec3inputField(_transform[2], m_activeObject->GetScale(), 0, 50);
+
+                    if(ImGui::Button("Recenter", ImVec2(100, 25)))
+                    {
+                        m_activeObject->SetTransform(fVec3(0), fVec3(0), fVec3(1));
+                    }
+                    ImGui::Separator();
+
+                    ImGui::Spacing();ImGui::Spacing();
+                    ImGui::PushStyleColor(ImGuiCol_Text, THEME_COLOR);
+                    ImGui::SeparatorText("Object Materials");
+                    ImGui::PopStyleColor();
+                    ImGui::ColorEdit4("Color", &m_activeObject->material.color.x);
+                    ImGui::Spacing();ImGui::Spacing();
+                    ImGui::Separator();
+                    ImGui::SliderFloat(" : Specular", &m_activeObject->material.specular, 0, 1);
+                    ImGui::Separator();
+                    ImGui::SliderFloat(" : Diffuse", &m_activeObject->material.diffuse, 0, 1);
+                    ImGui::Separator();
+                    ImGui::SliderFloat(" : Ambient", &m_activeObject->material.ambient, 0, 1);
+                    ImGui::Separator();
+                    ImGui::SliderFloat(" : Roughness", &m_activeObject->material.roughness, 0, 1);
+                    ImGui::Separator();
+
+                    if(ImGui::Button("-RESET-", ImVec2(100, 25)))
+                    {
+                        m_activeObject->material.specular = 0.8;
+                        m_activeObject->material.diffuse = 0.4;
+                        m_activeObject->material.ambient= 0.1;
+                        m_activeObject->material.roughness = 0.5;
+                    }
+                }
+                else
+                {
+                    ImGui::Spacing();ImGui::Spacing();
+                    ImGui::Separator();
+                    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+                    ImGui::Text("No Active Object !");
+                    ImGui::Text("Select object to open inspector !");
+                    ImGui::PopStyleColor();
+                    ImGui::Separator();
+                }
                 ImGui::End();
             }
 
