@@ -22,11 +22,38 @@ namespace GUI
         ImGui::TextUnformatted(label.c_str());
         ImGui::SameLine();
 
-        ImVec2 buttonSize = { 25, 25 };
+        ImVec2 buttonSize = { 20, 20 };
 
         ImGui::Button("X", buttonSize);
 
-        ImGui::PushItemWidth(40);
+        ImGui::PushItemWidth(35);
+        ImGui::SameLine();
+        ImGui::DragFloat(("##X" + label).c_str(), &vec3.x, 0.1f, min, max, "%.2f");
+        ImGui::SameLine();
+
+        ImGui::Button("Y", buttonSize);
+
+        ImGui::SameLine();
+        ImGui::DragFloat(("##Y" + label).c_str(), &vec3.y, 0.1f, min, max, "%.2f");
+        ImGui::SameLine();
+
+        ImGui::Button("Z", buttonSize);
+
+        ImGui::SameLine();
+        ImGui::DragFloat(("##Z" + label).c_str(), &vec3.z, 0.1f, min, max, "%.2f");
+        ImGui::PopItemWidth();
+        ImGui::Separator();
+    }
+
+    static void static_render_vec3inputFieldSep(std::string &label, fVec3 &vec3, float min = -THRESHOLD_FLOAT, float max = THRESHOLD_FLOAT)
+    {
+        ImGui::TextUnformatted(label.c_str());
+
+        ImVec2 buttonSize = { 20, 20 };
+
+        ImGui::Button("X", buttonSize);
+
+        ImGui::PushItemWidth(35);
         ImGui::SameLine();
         ImGui::DragFloat(("##X" + label).c_str(), &vec3.x, 0.1f, min, max, "%.2f");
         ImGui::SameLine();
@@ -77,6 +104,7 @@ namespace GUI
             initializeGUIEntity();
             m_cam = &app.m_renderer->GetCamera();
             m_activeRenderer = app.m_renderer;
+            m_app = &app;
         }
 
         void Render()
@@ -87,8 +115,8 @@ namespace GUI
 
             if(m_showOutliner)
             {
-                ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetMainViewport()->Size.y));
-                ImGui::Begin("Outliner", NULL, DEFAULT_UI_FLAGS | ImGuiWindowFlags_NoBringToFrontOnFocus);
+                ImGui::SetNextWindowSize(ImVec2(225, ImGui::GetMainViewport()->Size.y));
+                ImGui::Begin("Outliner", NULL, DEFAULT_UI_FLAGS | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar);
                 ImGui::TextUnformatted("Outliner");
                 ImGui::Spacing();ImGui::Spacing();
                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
@@ -97,13 +125,72 @@ namespace GUI
 
                 for(const auto &renderItem : m_activeRenderer->m_renderQueue)
                 {
-                    if(ImGui::Button(renderItem->GetName().c_str(), ImVec2(ImGui::GetWindowSize().x, 25)))
+                    if(ImGui::Button(renderItem->GetName().c_str(), ImVec2(ImGui::GetWindowSize().x - 25, 25)))
                     {
                         std::cout << "Clicked button : " << renderItem->GetName() << std::endl;
                         m_activeObject = renderItem;
                     }
-                    ImGui::Separator();
                 }
+
+                if(ImGui::IsWindowFocused())
+                {
+                    m_cam->m_isNavActive = false;
+                    m_cam->m_isActive = false;
+                }
+                else
+                {
+                    m_cam->m_isNavActive = true;
+                }
+
+                ImGui::Separator();
+                ImGui::Spacing();ImGui::Spacing();
+                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
+                ImGui::SeparatorText("World");
+                ImGui::PopStyleColor();
+                static std::string appbg("Background");
+                ImGui::ColorEdit3("WColor", &m_app->m_window.m_color.x);
+                ImGui::Checkbox("Grid Enable", &m_activeRenderer->m_gridActive);
+                ImGui::Checkbox("Wireframe", &m_activeRenderer->m_wireframeEnable);
+                if(ImGui::Button("-Default-", ImVec2(ImGui::GetWindowSize().x - 25, 25)))
+                {
+                    m_app->m_window.m_color = fVec3(0.1);
+                    m_activeRenderer->m_gridActive = true;
+                    m_activeRenderer->m_wireframeEnable = false;
+                }
+                ImGui::Separator();
+
+                ImGui::Spacing();ImGui::Spacing();
+                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
+                ImGui::SeparatorText("Camera Properties");
+                ImGui::PopStyleColor();
+
+                ImGui::SliderFloat(": Sens.", &m_cam->m_camProp.sensitivity, 0.05, 0.8);
+                ImGui::Separator();
+                ImGui::SliderFloat(": Speed", &m_cam->m_camProp.speed, 75, 150);
+                ImGui::Separator();
+                ImGui::SliderFloat(": Zoom", &m_cam->m_camProp.zoom, 15, 90);
+                ImGui::Spacing();ImGui::Spacing();
+                if(ImGui::Button("Reset", ImVec2(ImGui::GetWindowSize().x - 25, 25)))
+                {
+                    m_cam->m_camProp.sensitivity = Math::Sensitivity::HIGH * CAM_SENMULTIPLIER;
+                    m_cam->m_camProp.speed = Math::Speed::FAST * CAM_SPEEDMULTIPLIER;
+                    m_cam->m_camProp.zoom = 45;
+                }
+                ImGui::Separator();
+
+                ImGui::Spacing();ImGui::Spacing();
+                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(160,34,240,255));
+                ImGui::SeparatorText("Light Properties");
+                ImGui::PopStyleColor();
+                static std::string lightProp[1] = {"Direction : "};
+                static_render_vec3inputFieldSep(lightProp[0], m_activeRenderer->m_dirLight.direction);
+                ImGui::ColorEdit3("LColor", &m_activeRenderer->m_dirLight.color.x);
+                if(ImGui::Button("-Reset-", ImVec2(ImGui::GetWindowSize().x - 25, 25)))
+                {
+                    m_activeRenderer->m_dirLight.direction = fVec3(-0.5);
+                    m_activeRenderer->m_dirLight.color = fVec3(1);
+                }
+                ImGui::Separator();
 
                 ImGui::SetWindowPos(ImVec2(0, 0));
                 ImGui::End();
@@ -160,13 +247,23 @@ namespace GUI
             }
 
             ImGui::Begin("Inspector Toggle", NULL, DEFAULT_UI_FLAGS);
+            ImGui::SetWindowSize({45, 45});
             ImGui::SetWindowPos(ImVec2(ImGui::GetMainViewport()->Size.x - ImGui::GetWindowSize().x, 5));
-            ImGui::Checkbox(m_showInspector ? "Hide" : "Show", &m_showInspector);
+            // ImGui::Checkbox(m_showInspector ? "Hide" : "Show", &m_showInspector);
+            if(ImGui::ArrowButton("Inspector Toggle Arrow", m_showInspector?ImGuiDir_Right:ImGuiDir_Left))
+            {
+                m_showInspector = !m_showInspector;
+            }
             ImGui::End();
 
             ImGui::Begin("Outliner Toggle", NULL, DEFAULT_UI_FLAGS);
+            ImGui::SetWindowSize({45, 45});
             ImGui::SetWindowPos(ImVec2(5, ImGui::GetMainViewport()->Size.y - 50));
-            ImGui::Checkbox("Outliner", &m_showOutliner);
+            // ImGui::Checkbox("Outliner", &m_showOutliner);
+            if(ImGui::ArrowButton("Inspector Toggle Arrow", m_showOutliner?ImGuiDir_Left:ImGuiDir_Right))
+            {
+                m_showOutliner = !m_showOutliner;
+            }
             ImGui::End();
 
 			ImGui::Render();
@@ -182,6 +279,7 @@ namespace GUI
         protected:
         ImGuiIO m_io;
         Component::Camera *m_cam;
+        Component::Application *m_app;
         bool m_showInspector, m_showOutliner;
         std::vector<Interface::IRenderableGUI*> m_GUIEntity;
         Component::Renderer *m_activeRenderer;

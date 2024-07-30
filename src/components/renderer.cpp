@@ -6,6 +6,7 @@
 #include<glfw3.h>
 #include<buffer.cpp>
 #include<shader.cpp>
+#include<entity.cpp>
 #include<vertexgenerator.cpp>
 #include<event.cpp>
 #include<imgui.h>
@@ -27,8 +28,8 @@ namespace Component
     #define CAM_Z_NEAR 0.1f
     #define CAM_Z_FAR 100.0f
 
-    #define CAM_SENMULTIPLIER 0.03
-    #define CAM_SPEEDMULTIPLIER 4.0f
+    #define CAM_SENMULTIPLIER 0.04
+    #define CAM_SPEEDMULTIPLIER 8.0f
 
     struct CameraProp
     {
@@ -77,8 +78,8 @@ namespace Component
             {
                 return;
             }
-            float vel = m_camProp.speed * ImGui::GetIO().DeltaTime;
             Math::Movement dir = m_keyNavMap[key.GetKey()];
+            float vel = m_camProp.speed * ImGui::GetIO().DeltaTime;
             // std::cout << "Key got here : " << char(key.GetKey()) << std::endl;
             switch(dir)
             {
@@ -233,6 +234,7 @@ namespace Component
             m_dirLight.ambient = fVec3(1);
             m_dirLight.diffuse = fVec3(1);
             m_dirLight.specular = fVec3(1);
+            m_gridActive = true;
         }
 
         void AddEntity(Interface::IRenderableEntity *entity)
@@ -247,6 +249,13 @@ namespace Component
             updateVAOShaderInMap(entity->GetBufferLayout());
         }
 
+        void AddDuplicateEntity(Interface::IRenderableEntity *origin)
+        {
+            std::cout << "Duplicate entry register : " << origin->GetName() << std::endl;
+            Interface::IRenderableEntity *temp = new DuplicateModel(origin, origin->GetTransform());
+            AddEntity(temp);
+        }
+
         void Update()
         {
             m_grid.Update();
@@ -258,7 +267,8 @@ namespace Component
 
         void Render()
         {
-            m_grid.Render();
+            if(m_gridActive)
+                m_grid.Render();
             for(const auto &item : m_renderQueue)
             {
                 Shader *tempShader = m_shaderMap[item->GetBufferLayout()];
@@ -281,6 +291,7 @@ namespace Component
                 tempShader->SetUniformVec3("light.ambient", m_dirLight.ambient);
                 tempShader->SetUniformVec3("light.diffuse", m_dirLight.diffuse);
                 tempShader->SetUniformVec3("light.specular", m_dirLight.specular);
+                tempShader->SetUniformVec3("light.color", m_dirLight.color);
 
                 // material properties
                 tempShader->SetUniformFloat("material.ambient", item->material.ambient);
@@ -289,12 +300,17 @@ namespace Component
                 tempShader->SetUniformFloat("material.roughness", item->material.roughness);
                 tempShader->SetUniformVec4("material.color", item->material.color);
 
+                if(m_wireframeEnable)
+		            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                else
+		            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
                 item->Render();
             }
         }
 
         Camera& GetCamera()  {   return m_camera;    }
-        
+
         protected:
         void updateVAOShaderInMap(uint32_t layout)
         {
@@ -324,11 +340,12 @@ namespace Component
 
         public:
         std::vector<Interface::IRenderableEntity*> m_renderQueue;
+        // temporarly directional light for now
+        DirectionalLightProp m_dirLight;
+        bool m_gridActive, m_wireframeEnable;
         protected:
         Camera m_camera;
         GridLine m_grid;
-        // temporarly directional light for now
-        DirectionalLightProp m_dirLight;
         // here the map is intact between the buffer layout along with the VAO and corresponding shader map 
         static std::map<uint32_t, Shader*> m_shaderMap;
     };

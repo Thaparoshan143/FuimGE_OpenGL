@@ -50,13 +50,16 @@ class GEApplication : public Component::Application
 		m_renderer->AddEntity(&tempModel);
 		Math::Transform newTrans(fVec3(-5, 0, -5), fVec3(0), fVec3(0.5));
 		DuplicateModel dupCube(&tempModel2, newTrans);
-		m_renderer->AddEntity(&dupCube);
+		// m_renderer->AddEntity(&dupCube);
+		m_renderer->AddDuplicateEntity(&tempModel2);
+		m_renderer->AddDuplicateEntity(&dupCube);
+		m_renderer->AddDuplicateEntity(&tempModel2);
 
 		while(!m_window.ShouldCloseWindow())
 		{
         	glfwPollEvents();
 
-			m_window.SetBgColor(DEFAULT_WINDOW_BG);
+			m_window.BgColor();
 
 			m_renderer->Update();
 			m_renderer->Render();
