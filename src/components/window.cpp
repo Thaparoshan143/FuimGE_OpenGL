@@ -53,18 +53,21 @@ namespace Component
             glfwSetCursorPosCallback(this->m_window, static_cursor_pos_callback);
             glfwSetCursorEnterCallback(this->m_window, static_cursor_enter_callback);
             glfwSetWindowSizeCallback(this->m_window, static_window_size_change);
+            m_color = fVec3(0.1);
         }
         ~Window()   {   glfwTerminate();    }
 
         GLFWwindow* GetWindowHandle()   {   return   m_window;   }
         WindowProp GetWindowProp()  {   return m_winProp;    }
         inline bool ShouldCloseWindow() {   return glfwWindowShouldClose(m_window);   }
+        void BgColor() {   SetBgColor(m_color.x, m_color.y, m_color.z, 1);   }
         void SetBgColor(Color4 col) {   SetBgColor(col.r, col.g, col.b, col.a);   }
         void SetBgColor(float r, float g, float b, float a) {   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); glClearColor(r, g, b, a);   }
         void SwapFrameBuffer()   {   glfwSwapBuffers(m_window);  }
 
         GLFWwindow *m_window;
         WindowProp m_winProp;
+        fVec3 m_color;
     };
 }
 #endif
