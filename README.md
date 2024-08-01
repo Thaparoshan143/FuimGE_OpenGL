@@ -27,6 +27,10 @@ Build application exist inside `exe` folder
 ## How to use 
 ![GR interface](misc/GRinterface.png?raw=true "Title")
 
+
+https://github.com/user-attachments/assets/d8c7db2c-b227-4ee1-b9f7-57d133938d35
+
+
 ### Left
 > <b>World</b> \
     - Color \
