@@ -102,7 +102,7 @@ namespace Component
                     m_transform.position -= m_camProp.up * vel;
                 break;
                 default:
-                    std::cout << "Unknow direction to process ! Try again" << std::endl;
+                    std::cout << "Unknown direction to process ! Try again" << std::endl;
                 break;
             }
             // std::cout << m_transform.position.x << ", " << m_transform.position.y << ", " << m_transform.position.z << std::endl;
