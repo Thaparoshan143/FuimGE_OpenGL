@@ -250,53 +250,53 @@ namespace Math
         );
     }
 
-    static Mat4 RotateMat(float angle, fVec3 axis)
-    {
-        fVec3 normalized_axis = Math::normalize(axis);
-        float x = normalized_axis.x, y = normalized_axis.y, z = normalized_axis.z;
-        float c = cosf(ToRadian(angle)), s = sinf(ToRadian(angle));
+    // static Mat4 RotateMat(float angle, fVec3 axis)
+    // {
+    //     fVec3 normalized_axis = Math::normalize(axis);
+    //     float x = normalized_axis.x, y = normalized_axis.y, z = normalized_axis.z;
+    //     float c = cosf(ToRadian(angle)), s = sinf(ToRadian(angle));
         
-        return Mat4(
-                c + x*x*(1-c),          x*y*(1-c) + z*s,        x*z*(1-c) - y*s,    0,
-                y*x*(1-c) - z*s,        c + y*y*(1-c),          y*z*(1-c) + x*s,    0,
-                z*x*(1-c) + y*s,        z*y*(1-c) - x*s,        c + z*z*(1-c),      0,
-                0,                      0,                      0,                  1
-            );
-    }
+    //     return Mat4(
+    //             c + x*x*(1-c),          x*y*(1-c) + z*s,        x*z*(1-c) - y*s,    0,
+    //             y*x*(1-c) - z*s,        c + y*y*(1-c),          y*z*(1-c) + x*s,    0,
+    //             z*x*(1-c) + y*s,        z*y*(1-c) - x*s,        c + z*z*(1-c),      0,
+    //             0,                      0,                      0,                  1
+    //         );
+    // }
 
-    static Mat4 TransposeMat(Mat4 &mat)
-    {
-        return Mat4(
-            mat.m00, mat.m01, mat.m02, mat.m03,
-            mat.m10, mat.m11, mat.m12, mat.m13,
-            mat.m20, mat.m21, mat.m22, mat.m23,
-            mat.m30, mat.m31, mat.m32, mat.m33
-	    );
-    }
+    // static Mat4 TransposeMat(Mat4 &mat)
+    // {
+    //     return Mat4(
+    //         mat.m00, mat.m01, mat.m02, mat.m03,
+    //         mat.m10, mat.m11, mat.m12, mat.m13,
+    //         mat.m20, mat.m21, mat.m22, mat.m23,
+    //         mat.m30, mat.m31, mat.m32, mat.m33
+	//     );
+    // }
 
-    static Mat4 IdentityMat()
-    {
-        return Mat4(
-            1,  0,  0,  0,
-            0,  1,  0,  0,
-            0,  0,  1,  0,
-            0,  0,  0,  1
-        );
-    }
+    // static Mat4 IdentityMat()
+    // {
+    //     return Mat4(
+    //         1,  0,  0,  0,
+    //         0,  1,  0,  0,
+    //         0,  0,  1,  0,
+    //         0,  0,  0,  1
+    //     );
+    // }
 
-    static Mat4 Ortho(float left, float right, float bottom, float top, float back, float front)
-    {
-        float l = left, r = right, b = bottom, t = top, n = front, f = back;
-        float tx = -(r + l) / (r - l);
-        float ty = -(t + b) / (t - b);
-        float tz = -(f + n) / (f - n);
-        return Mat4(
-            2 / (r - l),  0,            0,            tx,
-            0,            2 / (t - b),  0,            ty,
-            0,            0,            2 / (f - n),  tz,
-            0,            0,            0,            1
-        );
-    }
+    // static Mat4 Ortho(float left, float right, float bottom, float top, float back, float front)
+    // {
+    //     float l = left, r = right, b = bottom, t = top, n = front, f = back;
+    //     float tx = -(r + l) / (r - l);
+    //     float ty = -(t + b) / (t - b);
+    //     float tz = -(f + n) / (f - n);
+    //     return Mat4(
+    //         2 / (r - l),  0,            0,            tx,
+    //         0,            2 / (t - b),  0,            ty,
+    //         0,            0,            2 / (f - n),  tz,
+    //         0,            0,            0,            1
+    //     );
+    // }
 
     static Mat4 Prespective(float fov, float aspectRatio, float near, float far)
     {

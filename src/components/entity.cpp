@@ -42,6 +42,8 @@ namespace Component
             dupCount++;
         }
 
+        ~DuplicateModel()   {   m_origin = nullptr; }
+
         void Update() override              {   m_origin->Update(); }
         void Render() override              {   m_origin->Render(); }
         uint32_t GetBufferLayout() override {   return m_origin->GetBufferLayout();    }
@@ -60,6 +62,14 @@ namespace Component
             name = _name;
             loadModel(path);
             std::cout << " IBO Count : " << m_meshes[0]->m_IBO.GetBufferSize() << std::endl;
+        }
+
+        ~Model()
+        {
+            for(auto &mesh : m_meshes)
+            {
+                delete mesh;
+            }
         }
 
         void Update() override  {   }

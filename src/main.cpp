@@ -24,7 +24,7 @@ class GEApplication : public Component::Application
 
 	~GEApplication()	
 	{
-		delete m_renderer;
+		delete m_GUIManager;
 	}
 
 	void Initialize() override	

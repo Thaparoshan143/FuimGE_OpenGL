@@ -53,6 +53,8 @@ namespace Component
             m_buffer.reserve(INIT_BUFFER_RESERVE);
         }
 
+        ~BufferObject() {   m_buffer.clear();   }
+
         uint32_t GetBufferHandle() const                {   return m_bufferHandle;  }
         std::vector<T>& GetBuffer()                     {   return m_buffer;    }
         uint32_t GetBufferSize()                        {   return m_buffer.size(); }

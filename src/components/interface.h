@@ -49,6 +49,7 @@ namespace Interface
     class IRenderableGUI
     {
         public:
+        virtual ~IRenderableGUI()   {   }
         virtual void Render() = 0;
     };
 }
