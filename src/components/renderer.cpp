@@ -11,6 +11,7 @@
 #include<event.cpp>
 #include<imgui.h>
 #include<map>
+#include<logger.h>
 
 // directory list map for the shader for corresponding buffer format;
 static std::map<uint32_t, std::string> _shader_dir = {
@@ -31,6 +32,7 @@ namespace Component
     #define CAM_SENMULTIPLIER 0.04
     #define CAM_SPEEDMULTIPLIER 8.0f
 
+    
     struct CameraProp
     {
         // These are different vector param in normalized form
@@ -41,6 +43,7 @@ namespace Component
 
     class Camera 
     {
+        Logger& logger = Logger::getInstance();
         public:
         Camera(CameraProp &camProp)
         {
@@ -74,6 +77,7 @@ namespace Component
 
         static void ProcessKeyNav(Input::KeyEvent key)
         {
+            Logger& logger = Logger::getInstance();
             if(!m_isNavActive)
             {
                 return;
@@ -103,6 +107,7 @@ namespace Component
                 break;
                 default:
                     std::cout << "Unknown direction to process ! Try again" << std::endl;
+                    logger.log(Logger::LogLevel::ERROR, "Unknown direction to process ! Try again" );
                 break;
             }
             // std::cout << m_transform.position.x << ", " << m_transform.position.y << ", " << m_transform.position.z << std::endl;
@@ -225,6 +230,7 @@ namespace Component
 
     class Renderer 
     {
+        Logger& logger = Logger::getInstance();
         public:
         Renderer(CameraProp &camProp, GridProp &gridProp) : m_camera(camProp), m_grid(gridProp)
         {
@@ -241,7 +247,8 @@ namespace Component
         {
             if(entity == nullptr)
             {
-                std::cout << "The pointer is null ! Push next vaid entity" << std::endl;
+                std::cout << "The pointer is null ! Push next valid entity" << std::endl;
+                logger.log(Logger::LogLevel::ERROR, "The pointer is null! Push next valid entity" );
                 return;
             }
             m_renderQueue.push_back(entity);
@@ -252,6 +259,7 @@ namespace Component
         void AddDuplicateEntity(Interface::IRenderableEntity *origin, uint32_t count = 1, bool incTransform = false)
         {
             std::cout << "==> Duplicate entry register : " << origin->GetName() << std::endl;
+            logger.log(Logger::LogLevel::INFO, "==> Duplicate entry register : " + std::string(origin->GetName()));
             for(uint32_t i=0;i<count;++i)
             {
                 Math::Transform newTras = origin->GetTransform();
@@ -322,7 +330,8 @@ namespace Component
         {
             if(m_shaderMap.count(layout) == 0)
             {
-                std::cout << "Layout is unknow adding the new map now" << std::endl;
+                std::cout << "Layout is unknown adding the new map now" << std::endl;
+                logger.log(Logger::LogLevel::INFO, "Layout is unknown adding the new map now");
                 Component::VertexArrayObject *tempVAO = new VertexArrayObject((BufferFormat)layout);
                 tempVAO->EnableVertexAttrib();
                 Shader *tempShader = nullptr;
@@ -331,16 +340,19 @@ namespace Component
                     tempShader = new Shader(_shader_dir[layout], "ver.shader", "frag.shader");
                     tempShader->CompileProgram();
                     std::cout << "Dir added : " << _shader_dir[layout] << std::endl;
+                    logger.log(Logger::LogLevel::INFO, "Dir Added : " + std::string(_shader_dir[layout]));
                     m_shaderMap[layout] = tempShader;
                 }
                 catch(...)
                 {
                     std::cout << "Unable to find the shader from global map" << std::endl;
+                    logger.log(Logger::LogLevel::ERROR, "Unable to find the shader from global map" );
                 }
             }
             else
             {
                 std::cout << "Layout already predefined : " << _shader_dir[layout] << std::endl;
+                logger.log(Logger::LogLevel::INFO, "Layout already predefined : " + std::string(_shader_dir[layout]));
             }
         }
 

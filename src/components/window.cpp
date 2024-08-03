@@ -5,6 +5,7 @@
 #include<glfw3.h>
 #include<structure.cpp>
 #include<renderer.cpp>
+#include <logger.h>
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
@@ -29,8 +30,10 @@ namespace Component
         public:
         Window(WindowProp &winProp) : m_winProp(winProp)
         {
-            if(!glfwInit())   {   std::cout << "GLFW initialize error" << std::endl;  exit(-1);    }
-            
+            Logger& logger = Logger::getInstance();
+            logger.log(Logger::LogLevel::NEWLOG, "Log Started");
+            if(!glfwInit())   {   std::cout << "GLFW initialize error" << std::endl;  exit(-1);  logger.log(Logger::LogLevel::ERROR, "GLFW Initialize Error");}
+            logger.log(Logger::LogLevel::INFO, "GLFW Initialized");
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);

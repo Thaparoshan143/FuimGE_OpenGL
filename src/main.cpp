@@ -3,7 +3,9 @@
 #include<entity.cpp>
 #include<renderer.cpp>
 #include<gui.cpp>
+#include<logger.h>
 
+Logger& logger = Logger::getInstance("application.log");
 class GEApplication : public Component::Application
 {
 	public:
@@ -50,13 +52,16 @@ class GEApplication : public Component::Application
 		m_renderer->AddEntity(&tempModel);
 		m_renderer->AddDuplicateEntity(&tempModel, 2, true);
 		m_renderer->AddDuplicateEntity(&tempModel2, 2, true);
+		
 
 		while(!m_window.ShouldCloseWindow())
 		{
         	glfwPollEvents();
 
 			m_window.BgColor();
-
+			logger.setStreamOutput(std::cout, Logger::LogLevel::WARNING);
+			logger.setStreamOutput(std::cout, Logger::LogLevel::INFO);
+			logger.setStreamOutput(std::cerr, Logger::LogLevel::ERROR);
 			m_renderer->Update();
 			m_renderer->Render();
 
@@ -75,7 +80,7 @@ int main()
 {
 	Component::ApplicationProp appProp(800, 600, "GE");
 	GEApplication *mainApplication = new GEApplication(appProp);
-	
+	logger.log(Logger::LogLevel::INFO, "Application started");
 	mainApplication->Initialize();
 	mainApplication->Loop();
 

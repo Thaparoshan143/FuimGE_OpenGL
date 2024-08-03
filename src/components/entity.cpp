@@ -54,12 +54,14 @@ namespace Component
 
     class Model : public Interface::IRenderableEntity
     {
+        Logger& logger = Logger::getInstance();
         public:
         Model(std::string path, uint32_t layout = PPP_UV_NNN, std::string _name = "Default", bool gamma = false) : m_VAO((BufferFormat)layout)
         {
             name = _name;
             loadModel(path);
             std::cout << " IBO Count : " << m_meshes[0]->m_IBO.GetBufferSize() << std::endl;
+            logger.log(Logger::LogLevel::INFO, "IBO Count : " + std::string(std::to_string(m_meshes[0]->m_IBO.GetBufferSize())));
         }
 
         void Update() override  {   }
@@ -87,6 +89,7 @@ namespace Component
             if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
             {
                 std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
+                logger.log(Logger::LogLevel::ERROR, "ASSIMP::" + std::string(importer.GetErrorString()));
                 return;
             }
             // retrieve the directory path of the filepath
@@ -107,11 +110,13 @@ namespace Component
                 aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
                 m_meshes.push_back(processMesh(mesh, scene));
                 std::cout << "Processing Main Node : " << i << std::endl;
+                logger.log(Logger::LogLevel::INFO, "Processing Main Node : " + std::string(std::to_string(i)));
             }
             // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
             for(uint i = 0; i < node->mNumChildren; i++)
             {
                 std::cout << "Processing Children Node : " << i << std::endl;
+                logger.log(Logger::LogLevel::INFO, "Processing Children Node : " + std::string(std::to_string(i)));
                 processNode(node->mChildren[i], scene);
             }
         }

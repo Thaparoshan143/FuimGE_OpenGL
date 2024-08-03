@@ -8,6 +8,7 @@
 #include<fstream>
 #include<sstream>
 #include<ios>
+#include <logger.h>
 
 namespace Component
 {
@@ -77,8 +78,10 @@ namespace Component
 
             if (result == GL_FALSE)
             {
+                Logger& logger = Logger::getInstance();
                 glGetShaderInfoLog(id, 512, NULL, infoLog);
                 std::cout << "ERROR::Shader::" << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT") << "::COMPILATION_FAILED\n" << infoLog << std::endl;
+                logger.log(Logger::LogLevel::ERROR, "ERROR::Shader::" + std::string((type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT")) + "::COMPILATION_FAILED\n");
             }
             delete[] src;
             return id;
@@ -91,7 +94,9 @@ namespace Component
             std::stringstream tempBuffer;
             if(!tempStream.is_open())
             {
+                Logger& logger = Logger::getInstance();
                 std::cout << "Failed to load file for read ! : " << m_dir + fileName << std::endl;
+                logger.log(Logger::LogLevel::ERROR, "Failed to load file for read" + std::string(m_dir) + std::string(fileName));
             }
             tempBuffer << tempStream.rdbuf();
             tempStream.close();

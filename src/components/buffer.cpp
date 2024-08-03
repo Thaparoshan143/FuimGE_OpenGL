@@ -5,6 +5,7 @@
 #include<glad.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include<stb_image.h>
+#include <logger.h>
 
 // 256 buffer reserve by default if not mentioned
 #define INIT_BUFFER_RESERVE 256
@@ -143,6 +144,7 @@ namespace Component
 
     class Texture 
     {
+        Logger& logger = Logger::getInstance();
         public:
         Texture(std::string path, std::string type = "") : m_path(path)
         {
@@ -159,7 +161,9 @@ namespace Component
             External::stbi_set_flip_vertically_on_load(true);
             int channelCount = 3;
             u_char *rawImage = External::stbi_load(m_path.c_str(), &m_imgDim.x, &m_imgDim.y, &channelCount, 0);
-            std::cout << "Raw load successfully" << std::endl;
+            std::cout << "Raw load successful" << std::endl;
+            logger.log(Logger::LogLevel::INFO, "Raw Load Successful\n");
+
             glTexParameteri(m_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(m_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -173,6 +177,7 @@ namespace Component
             else
             {
                 std::cout << "Unable to read and offload the image data" << std::endl;
+                logger.log(Logger::LogLevel::INFO, "Unable to read and offload the image data\n");
             }
             External::stbi_image_free(rawImage);
         }
