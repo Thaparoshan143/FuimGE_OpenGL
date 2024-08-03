@@ -79,13 +79,21 @@ namespace GUI
         public:
         GUIManager()
         {
-            m_showInspector = false;
-            m_showOutliner = false;
+            m_showInspector = true;
+            m_showOutliner = true;
             m_activeObject = nullptr;
         }
 
         ~GUIManager()
         {
+            for(auto &entity : m_GUIEntity)
+            {
+                delete entity;
+            }
+            m_activeRenderer = nullptr;
+            m_activeObject = nullptr;
+            m_cam = nullptr;
+            m_app = nullptr;
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();

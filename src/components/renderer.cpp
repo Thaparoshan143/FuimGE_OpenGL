@@ -243,6 +243,14 @@ namespace Component
             m_gridActive = true;
         }
 
+        ~Renderer()
+        {
+            for(auto &item : m_shaderMap)
+            {
+                delete item.second;
+            }
+        }
+
         void AddEntity(Interface::IRenderableEntity *entity)
         {
             if(entity == nullptr)

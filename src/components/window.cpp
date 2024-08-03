@@ -22,7 +22,7 @@ namespace Component
         WindowProp(WindowProp &winProp) {   width = winProp.width;  height = winProp.height;    title = winProp.title;  }
 
         int width, height;
-        String title;
+        std::string title;
     };
 
     class Window
@@ -41,7 +41,7 @@ namespace Component
                 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
             #endif
 
-            m_window = glfwCreateWindow(m_winProp.width, m_winProp.height, m_winProp.title.GetRawChar(), NULL, NULL);
+            m_window = glfwCreateWindow(m_winProp.width, m_winProp.height, m_winProp.title.c_str(), NULL, NULL);
             glfwMakeContextCurrent(m_window);
 
             // loader glad check if everything is loaded for use 

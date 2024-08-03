@@ -27,7 +27,11 @@ namespace Component
             
         }
 
-        virtual ~Application()  {   }
+        virtual ~Application()
+        {   
+		    delete m_renderer;
+        }
+
         virtual void Initialize()   {   }
 
         virtual void Loop()
