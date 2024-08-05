@@ -4,12 +4,15 @@
 #include<renderer.cpp>
 #include<gui.cpp>
 #include<logger.h>
+#include<filesystem>
+
+namespace fs = std::__fs::filesystem;
 
 Logger& logger = Logger::getInstance("application.log");
-class GEApplication : public Component::Application
+class GRApplication : public Component::Application
 {
 	public:
-	GEApplication(Component::ApplicationProp appProp) : Application(appProp)
+	GRApplication(Component::ApplicationProp appProp) : Application(appProp)
 	{
 		Component::CameraProp camProp;
 		camProp.worldUp = fVec3(0, 1, 0);
@@ -24,7 +27,7 @@ class GEApplication : public Component::Application
 		m_GUIManager = new GUI::GUIManager;
 	}
 
-	~GEApplication()	
+	~GRApplication()	
 	{
 		delete m_GUIManager;
 	}
@@ -44,15 +47,29 @@ class GEApplication : public Component::Application
 	void Loop() override
 	{
 		using namespace Component;
-		Model tempModel2("./res/Models/cube.obj", PPP_NNN, "Cube");
-		Model tempModel("./res/Models/sphere.obj", PPP_NNN, "Sphere");
-		tempModel2.SetTransform(fVec3(-5, 0, 1), fVec3(0, 20, 0), fVec3(1.1));
-		tempModel.SetTransform(fVec3(1, 0, -5), fVec3(0, 0, 0), fVec3(2));
-		m_renderer->AddEntity(&tempModel2);
-		m_renderer->AddEntity(&tempModel);
-		m_renderer->AddDuplicateEntity(&tempModel, 2, true);
-		m_renderer->AddDuplicateEntity(&tempModel2, 2, true);
-		
+		std::vector<Model*> modelEntry;
+		int index = -4;
+
+		for (const auto& entry : fs::directory_iterator("./res/Models")) 
+		{ 
+			if (fs::is_regular_file(entry)) 
+			{ 
+				std::cout << entry.path() << std::endl;
+				std::string fileName(entry.path().filename());
+				fileName = fileName.substr(0, fileName.find_last_of("."));
+				Model *temp = new Model(entry.path(), PPP_NNN, fileName);
+				temp->SetTransform(fVec3(index, 0.05, index%3), fVec3(0), fVec3(1));
+				modelEntry.push_back(temp);
+				index+=2;
+			} 
+    	}
+
+		delay();
+
+		for(auto &item : modelEntry)
+		{
+			m_renderer->AddEntity(item);
+		}
 
 		while(!m_window.ShouldCloseWindow())
 		{
@@ -68,6 +85,11 @@ class GEApplication : public Component::Application
 			m_GUIManager->Render();
 			m_window.SwapFrameBuffer();
 		}
+
+		for(auto &item : modelEntry)
+		{
+			delete item;
+		}
 	}
 
 	protected:
@@ -78,8 +100,8 @@ class GEApplication : public Component::Application
 
 int main()
 {
-	Component::ApplicationProp appProp(800, 600, "GE");
-	GEApplication *mainApplication = new GEApplication(appProp);
+	Component::ApplicationProp appProp(1200, 800, "FuimGR");
+	GRApplication *mainApplication = new GRApplication(appProp);
 	logger.log(Logger::LogLevel::INFO, "Application started");
 	mainApplication->Initialize();
 	mainApplication->Loop();
