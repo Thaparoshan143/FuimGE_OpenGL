@@ -16,14 +16,14 @@ class GRApplication : public Component::Application
 	{
 		Component::CameraProp camProp;
 		camProp.worldUp = fVec3(0, 1, 0);
-		camProp.pitch = -25;
-		camProp.yaw = -135;
+		camProp.pitch = -20;
+		camProp.yaw = -90;
 		camProp.speed = Math::VERYFAST * CAM_SPEEDMULTIPLIER;
 		camProp.sensitivity = Math::HIGH * CAM_SENMULTIPLIER;
 		camProp.zoom = 45;
 		Component::GridProp gridProp({-10, 10}, {10, -10}, {19, 19});
 		m_renderer = new Component::Renderer(camProp, gridProp);
-		m_renderer->GetCamera().m_transform.position = fVec3(5, 2, 5);
+		m_renderer->GetCamera().m_transform.position = fVec3(0, 6, 17);
 		m_GUIManager = new GUI::GUIManager;
 	}
 

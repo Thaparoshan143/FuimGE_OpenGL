@@ -79,8 +79,8 @@ namespace GUI
         public:
         GUIManager()
         {
-            m_showInspector = true;
-            m_showOutliner = true;
+            m_showInspector = !true;
+            m_showOutliner = !true;
             m_activeObject = nullptr;
         }
 
